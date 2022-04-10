@@ -1,1 +1,1 @@
-"The input does not contain any JSON tokens. Expected the input to start with a valid JSON token, when isFinalBlock is true. Path: $ | LineNumber: 0 | BytePositionInLine: 0."
+"The INSERT statement conflicted with the FOREIGN KEY constraint \u0022fk_shopitem_store_id\u0022. The conflict occurred in database \u0022JaConsoleDB\u0022, table \u0022dbo.StoreFront\u0022, column \u0027storeID\u0027."

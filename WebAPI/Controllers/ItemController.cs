@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using JAConsoleBL;
 using JAModel;
+using Microsoft.Extensions.Caching.Memory;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,9 +13,12 @@ namespace WebAPI.Controllers
     public class ItemController : ControllerBase
     {
         private readonly IJABL _bl;
+
         public ItemController(IJABL bl)
         {
             _bl = bl;
+
+        
         }
         #region HTTP Get
         // GET: api/<ItemController>
@@ -23,12 +28,23 @@ namespace WebAPI.Controllers
         {
             return await _bl.GetFoodInventoryAsync();
         }
-        //[Route("api/[stores]")]
-        //[HttpGet("[Stores]")]
-        //public List<Store> GetStores()
-        //{
-        //    return _bl.GetStores();
-        //}
+        
+        [HttpGet("GetStores")]
+        public List<Store> GetStores()
+        {
+            return _bl.GetStores();
+        }
+
+        [HttpPost("CreateFoodItem")]
+        public void CreateNewFoodItem(ShopItem _item) 
+        {
+            _bl.CreateNewFoodItem(_item); 
+        }
+        [HttpPost("CreateNewStore")]
+        public async Task CreateNewStoreAsync(Store _store)
+        {
+            await _bl.CreateNewStoreAsync(_store);
+        }
 
         [HttpGet("GetUsers")]
         public async Task<List<UserPass>> GetAllUsersAsync()
@@ -42,17 +58,17 @@ namespace WebAPI.Controllers
             return await _bl.GetAllAdminsAsync();
         }
 
-        [HttpGet("{itemName}")]
-        public ShopItem GetItemByName(string itemName)
+        [HttpGet("{itemName}/{storeID}")]
+        public async Task<ShopItem> GetItemByName(string itemName, int storeID)
         {
-            return _bl.SearchInventory(itemName);
+            return await _bl.SearchInventoryAsync(itemName, storeID);
         }
 
-        //[HttpGet]
-        //public string GetStoreName(int userID)
-        //{
-        //    return _bl.GetStoreName(userID);
-        //}
+        [HttpPut("{itemName}Price")]
+        public async Task ChangePriceAsync(ShopItem searchedItem, float newPrice, int storeID)
+        {
+            await _bl.ChangePriceAsync(searchedItem, newPrice, storeID);
+        }
 
         //[HttpGet]
         //public Dictionary<int, string> CheckOrderHistory(int _select, int _userID)
@@ -66,6 +82,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         public void Post([FromBody] string value)
         {
+
         }
 
         // PUT api/<ItemController>/5

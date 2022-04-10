@@ -24,7 +24,7 @@ public interface IJABL
     /// </summary>
     /// <param name="_shopItem">Item that holds data that is stored to the database</param>
     /// <param name="storeID">The store that the admin is restocking at</param>
-    void CreateNewFoodItem(JAModel.ShopItem _shopItem, int storeID);
+    Task CreateNewFoodItem(JAModel.ShopItem _shopItem);
 
     void SaveFoodInventory();
     /// <summary>
@@ -32,7 +32,7 @@ public interface IJABL
     /// </summary>
     /// <param name="itemName">The name of the food item that the user has searched for</param>
     /// <returns>Returns the shop item if there is a match; returns null if no match</returns>
-    public JAModel.ShopItem SearchInventory(string itemName);
+    Task <JAModel.ShopItem> SearchInventoryAsync(string itemName, int storeID);
     
     /// <summary>
     /// Creates a new user in the database that can create orders
@@ -55,7 +55,7 @@ public interface IJABL
     /// Creates a new store in the franchise
     /// </summary>
     /// <param name="_newStore"></param>
-    void CreateNewStore(JAModel.Store _newStore);
+    Task CreateNewStoreAsync(JAModel.Store _newStore);
     
     /// <summary>
     /// Removes an item from a user's current order
@@ -69,7 +69,7 @@ public interface IJABL
     /// <param name="_item">The item that the price is being modified to</param>
     /// <param name="_price">The new price that the admin inputs</param>
     /// <param name="storeID">The store that the admin is changing the price for</param>
-    void ChangePrice(JAModel.ShopItem _item, float _price, int storeID);
+    Task ChangePriceAsync(JAModel.ShopItem _item, float _price, int storeID);
     
     /// <summary>
     /// Changes the store that an admin or a user is shopping/restocking at

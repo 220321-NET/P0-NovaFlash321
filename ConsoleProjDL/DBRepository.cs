@@ -31,7 +31,7 @@ public class DBRespository : IRepo
         _connectionString = connectionString;
     }
 
-    public void CreateNewStore(JAModel.Store _newStore)
+    public async Task CreateNewStoreAsync(JAModel.Store _newStore)
     {
         SqlConnection connection = new SqlConnection(_connectionString);
         connection.Open();
@@ -52,7 +52,6 @@ public class DBRespository : IRepo
             
             Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
         }
-// cmd = new SqlCommand("INSERT INTO ShopItem(productName, productPrice, productQuantity, productType, storeID) OUTPUT INSERTED.productID VALUES(@name, @price, @quantity, @type, @storeid)", connection);
 
     }
 
@@ -286,7 +285,7 @@ public class DBRespository : IRepo
         
         while(reader.Read())
             {
-                //int productID = reader.GetInt32(0);
+                int productID = reader.GetInt32(0);
                 string productName = reader.GetString(1);
                 decimal productPrice = reader.GetDecimal(2);
                 int productQuantity = reader.GetInt32(3);
@@ -300,6 +299,7 @@ public class DBRespository : IRepo
                     Price = (float)productPrice,
                     Quantity = productQuantity,
                     StoreID = storeID,
+                    Id = productID
                 };
                 allFood.Add(item);
             }
@@ -307,7 +307,7 @@ public class DBRespository : IRepo
         connection.Close();
         return allFood;
     }
-    public void CreateNewFoodItem(JAModel.ShopItem _shopItem, int storeID)
+    public async Task CreateNewFoodItem(JAModel.ShopItem _shopItem) 
     {
         SqlConnection connection = new SqlConnection(_connectionString);
         connection.Open();
@@ -324,7 +324,7 @@ public class DBRespository : IRepo
         cmd.Parameters.AddWithValue("@price", _shopItem.Price);
         cmd.Parameters.AddWithValue("@quantity", _shopItem.Quantity);
         cmd.Parameters.AddWithValue("@type", _shopItem.TypeOfFood);
-        cmd.Parameters.AddWithValue("@storeid", storeID);
+        cmd.Parameters.AddWithValue("@storeid", _shopItem.StoreID);
 
 
         try
@@ -335,7 +335,8 @@ public class DBRespository : IRepo
         }
         catch(Exception e)
         {
-            Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
+            Console.WriteLine(e.Message);
+            //Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
         }
 
         // cmd = new SqlCommand("UPDATE ShopItem SET productPrice = @price WHERE productName = @name", connection);
@@ -358,15 +359,16 @@ public class DBRespository : IRepo
 
     }
 
-    public JAModel.ShopItem SearchInventory(string itemName)
+    public async Task<JAModel.ShopItem> SearchInventoryAsync(string itemName, int storeID)
     {
         SqlConnection connection = new SqlConnection(_connectionString);
         connection.Open();
         JAModel.ShopItem item = new JAModel.ShopItem();
         SqlCommand cmd = new SqlCommand();
 
-        cmd = new SqlCommand("SELECT * FROM ShopItem WHERE productName = @name",connection);
+        cmd = new SqlCommand("SELECT * FROM ShopItem WHERE productName = @name AND storeID = @storeid",connection);
         cmd.Parameters.AddWithValue("@name", itemName);
+        cmd.Parameters.AddWithValue("@storeid", storeID);
         SqlDataReader reader = cmd.ExecuteReader();
 
         while(reader.Read())
@@ -376,7 +378,7 @@ public class DBRespository : IRepo
                 string productName = reader.GetString(1);
                 decimal productPrice = reader.GetDecimal(2);
                 int productQuantity = reader.GetInt32(3);
-                int storeID = reader.GetInt32(4);
+                int searchedstoreID = reader.GetInt32(4);
                 string productType = reader.GetString(5);
 
                 item = new JAModel.ShopItem
@@ -386,7 +388,7 @@ public class DBRespository : IRepo
                     Name = productName,
                     Price = (float)productPrice,
                     Quantity = productQuantity,
-                    StoreID = storeID,
+                    StoreID = searchedstoreID,
                     Id = productID,
                 };
                 
@@ -419,7 +421,7 @@ public class DBRespository : IRepo
         connection.Close();
     }
     
-    public void ChangePrice(JAModel.ShopItem _item, float _price, int storeID)
+    public async Task ChangePriceAsync(JAModel.ShopItem _item, float _price, int storeID)
     {
         SqlConnection connection = new SqlConnection(_connectionString);
         connection.Open();

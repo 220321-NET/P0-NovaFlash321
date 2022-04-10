@@ -49,9 +49,9 @@ public class ConsoleProjBL : IJABL
         return await _repo.GetFoodInventoryAsync();
     }
 
-    public void CreateNewFoodItem(ShopItem _shopItem, int storeID)
+    public async Task CreateNewFoodItem(ShopItem _shopItem)
     {
-        _repo.CreateNewFoodItem(_shopItem, storeID);
+        await _repo.CreateNewFoodItem(_shopItem);
     }
 
 public void UpdateFoodItem(JAModel.ShopItem _item, int _additionalQuantity)
@@ -63,10 +63,10 @@ public void UpdateFoodItem(JAModel.ShopItem _item, int _additionalQuantity)
         _repo.SaveFoodInventory();
     }
 
-    public JAModel.ShopItem SearchInventory(string itemName)
+    public async Task <JAModel.ShopItem> SearchInventoryAsync(string itemName, int storeID)
     {
 
-        return _repo.SearchInventory(itemName);
+        return await _repo.SearchInventoryAsync(itemName, storeID);
     }
     public void CreateNewUser(JAModel.UserPass _newUser)
     {
@@ -77,14 +77,14 @@ public void UpdateFoodItem(JAModel.ShopItem _item, int _additionalQuantity)
     {
         return _repo.GetStores();
     }
-    public void CreateNewStore(JAModel.Store _newStore)
+    public async Task CreateNewStoreAsync(JAModel.Store _newStore)
     {
-        _repo.CreateNewStore(_newStore);
+        await _repo.CreateNewStoreAsync(_newStore);
     }
 
-    public void ChangePrice(JAModel.ShopItem _item, float _newPrice, int storeID)
+    public async Task ChangePriceAsync(JAModel.ShopItem _item, float _newPrice, int storeID)
     {
-        _repo.ChangePrice(_item,_newPrice, storeID);
+        await _repo.ChangePriceAsync(_item,_newPrice, storeID);
     }
 
 

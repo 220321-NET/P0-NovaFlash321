@@ -322,10 +322,10 @@ namespace JAConsole;
         switch(initInput)
         {
             case '1': await AddItemAsync(); break;
-            case '2': RemoveItem(); break;
-            case '3': ChangePrice(); break;
-            case '4': CreateNewAdmin(); break;
-            case '5': CreateNewStore(); break;
+            case '2': await RemoveItemAsync(); break;
+            case '3': await ChangePriceAsync(); break;
+            case '4': await CreateNewAdminAsync(); break;
+            case '5': await CreateNewStoreAsync(); break;
             case '6': ChangeStore(); break;
             case 'x':
                 Console.WriteLine("Returning to Login"); 
@@ -344,7 +344,7 @@ namespace JAConsole;
         
         }while(loggedIn);
     }
-    private void CreateNewStore()
+    private async Task CreateNewStoreAsync()
     {
         StoreName:
         Console.WriteLine("Enter the name of the store:");
@@ -433,7 +433,8 @@ namespace JAConsole;
                 switch(input)
                 {
                     case 'Y': 
-                        //_bl.CreateNewStore(newStore);
+                        await httpService.CreateNewStoreAsync(newStore);
+                        
                         break;
                     case 'N':
                         Console.WriteLine("Returning to Admin Menu!");
@@ -442,7 +443,7 @@ namespace JAConsole;
 
 
     }
-    private void CreateNewAdmin()
+    private async Task CreateNewAdminAsync()
     {
         ACreateName:
         Console.WriteLine("Enter your username:");
@@ -476,10 +477,9 @@ namespace JAConsole;
                 Console.WriteLine("You must enter a username.\n");
                 goto ALast;
             }
-        
-        AStore:
-        List<Store> allStores = new List<Store>(); 
-        //_bl.GetStores();
+
+    AStore:
+        List<Store> allStores = await httpService.GetStoresAsync();
             Console.WriteLine("Enter the franchise you are shopping at (this can be changed later):");
             foreach(Store _storeName in allStores)
             {
@@ -557,7 +557,7 @@ namespace JAConsole;
 
         
     }
-    private void AddNewItem(ShopItem _item, string _name)
+    private async Task AddNewItemAsync(ShopItem _item, string _name)
     {
         
         char input;
@@ -613,8 +613,8 @@ namespace JAConsole;
 
                 switch(input)
                 {
-                    case 'Y': 
-                        //_bl.CreateNewFoodItem(_item, currentUser.StoreID);
+                    case 'Y':
+                        await httpService.CreateNewFoodItemAsync(_item, currentUser.StoreID);
                         break;
                     case 'N':
                         Console.WriteLine("Returning to Admin Menu!");
@@ -640,7 +640,7 @@ namespace JAConsole;
             foodItem = foodItem.Replace(foodItem[0], upper);
             Console.WriteLine(foodItem);
 
-            ShopItem searchedItem = await httpService.SearchInventoryAsync(foodItem); 
+            ShopItem searchedItem = await httpService.SearchInventoryAsync(foodItem, currentUser.StoreID); 
             //_bl.SearchInventory(foodItem);
             
             if(searchedItem.Name == null || searchedItem.Name == "") 
@@ -664,7 +664,7 @@ namespace JAConsole;
                 switch(input)
                 {
                     case 'Y': 
-                        AddNewItem(searchedItem, foodItem);
+                        await AddNewItemAsync(searchedItem, foodItem);
                         break;
                     case 'N':
                         Console.WriteLine("Returning to Admin Menu!");
@@ -760,7 +760,7 @@ namespace JAConsole;
         //Console.WriteLine("Type the name of the item:");
         #endregion
     }
-    private void RemoveItem()
+    private async Task RemoveItemAsync()
     {
         char input;
         RIItemName:
@@ -778,9 +778,7 @@ namespace JAConsole;
             upper = char.ToUpper(upper);
             foodItem = foodItem.Replace(foodItem[0], upper);
 
-            ShopItem searchedItem = new ShopItem(); 
-            //_bl.SearchInventory(foodItem);
-
+            ShopItem searchedItem = await httpService.SearchInventoryAsync(foodItem, currentUser.StoreID);
             if(searchedItem == null || searchedItem.Name == "")
             {
                 Console.WriteLine("Item does not exist in the current inventory!");
@@ -838,7 +836,7 @@ namespace JAConsole;
             }
         }
     }
-    private void ChangePrice()
+    private async Task ChangePriceAsync()
     {
         char input;
         CPItemName:
@@ -857,8 +855,8 @@ namespace JAConsole;
             foodItem = foodItem.Replace(foodItem[0], upper);
             Console.WriteLine(foodItem);
 
-            ShopItem searchedItem = new ShopItem(); 
-            //_bl.SearchInventory(foodItem);
+            ShopItem searchedItem = await httpService.SearchInventoryAsync(foodItem, currentUser.StoreID);
+
 
             if(searchedItem == null || searchedItem.Name == "")
             {
@@ -902,6 +900,7 @@ namespace JAConsole;
                 {
                     
                     float _newPrice = float.Parse(rInput);
+                    await httpService.ChangePriceAsync(searchedItem.Name, _newPrice, currentUser.StoreID);
                     //_bl.ChangePrice(searchedItem, _newPrice, currentUser.StoreID);
 
                 }
