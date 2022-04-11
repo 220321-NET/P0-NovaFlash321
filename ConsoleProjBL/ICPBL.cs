@@ -50,7 +50,7 @@ public interface IJABL
     /// </summary>
     /// <param name="_item">The food item that is being modified</param>
     /// <param name="_additionalQuantity">The additional quantity that the admin is restocking with</param>
-    Task UpdateFoodItemAsync(JAModel.ShopItem _item, int _additionalQuantity);
+    Task UpdateFoodItemAsync(JAModel.ShopItem _item);
     /// <summary>
     /// Creates a new store in the franchise
     /// </summary>

@@ -30,15 +30,15 @@ namespace WebAPI.Controllers
         }
         
         [HttpGet("GetStores")]
-        public List<Store> GetStores()
+        public async Task<List<Store>> GetStores()
         {
-            return _bl.GetStores();
+            return await _bl.GetStoresAsync();
         }
 
         [HttpPost("CreateFoodItem")]
-        public void CreateNewFoodItem(ShopItem _item) 
+        public async Task CreateNewFoodItem(ShopItem _item) 
         {
-            _bl.CreateNewFoodItem(_item); 
+            await _bl.CreateNewFoodItemAsync(_item); 
         }
         [HttpPost("CreateNewStore")]
         public async Task CreateNewStoreAsync(Store _store)
@@ -83,6 +83,18 @@ namespace WebAPI.Controllers
             await _bl.CreateNewUserAsync(_tempUser);
         }
 
+        [HttpPost("CreateNewAdmin")]
+        public async Task CreateNewAdminAsync(UserPass _admin)
+        {
+            await _bl.CreateNewAdminAsync(_admin);
+        }
+
+        [HttpPut("UpdateItemQuantity/{_name}/{_storeID}")]
+        public async Task UpdateItemQuantityAsync(ShopItem _item, string _name, int _storeID)
+        {
+            await _bl.UpdateFoodItemAsync(_item);
+        }
+        
         //[HttpGet]
         //public Dictionary<int, string> CheckOrderHistory(int _select, int _userID)
         //{
@@ -92,11 +104,9 @@ namespace WebAPI.Controllers
         #endregion
         // GET api/<ItemController>/5
         // POST api/<ItemController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
 
-        }
+        
+
 
         // PUT api/<ItemController>/5
         [HttpPut("{id}")]

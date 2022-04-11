@@ -54,9 +54,9 @@ public class ConsoleProjBL : IJABL
         await _repo.CreateNewFoodItemAsync(_shopItem);
     }
 
-public async Task UpdateFoodItemAsync(JAModel.ShopItem _item, int _additionalQuantity)
+public async Task UpdateFoodItemAsync(JAModel.ShopItem _item)
     {
-        await _repo.UpdateFoodItemAsync(_item, _additionalQuantity);
+        await _repo.UpdateFoodItemAsync(_item);
     }
     public async Task SaveFoodInventoryAsync()
     {

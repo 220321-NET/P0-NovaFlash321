@@ -153,7 +153,7 @@ namespace ConsoleProjectUI
         public async Task<List<ShopItem>> SearchForOrderAsync()
         {
 
-            //potentially gets an SQL table? ask Juniper
+            
             //http get
         //search for order from json
         return new List<ShopItem>();
@@ -217,18 +217,58 @@ namespace ConsoleProjectUI
 
         public async Task CreateNewUserAsync(UserPass _tempUser)
         {
+            string url = _apiBaseURL + "CreateNewUser";
+            string serializedItem = JsonSerializer.Serialize(_tempUser);
+            StringContent content = new StringContent(serializedItem, Encoding.UTF8, "application/json");
+            HttpClient client = new HttpClient();
+            try
+            {
+                HttpResponseMessage response = await client.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
             //http post
         //create new user
         }
 
         public async Task CreateNewAdminAsync(UserPass _tempAdmin)
         {
+            string url = _apiBaseURL + "CreateNewAdmin";
+            string serializedItem = JsonSerializer.Serialize(_tempAdmin);
+            StringContent content = new StringContent(serializedItem, Encoding.UTF8, "application/json");
+            HttpClient client = new HttpClient();
+            try
+            {
+                HttpResponseMessage response = await client.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
             //http post
         //create new admin
         }
 
         public async Task UpdateItemQuantityAsync(ShopItem _item, int _quantity)
         {
+            string url = _apiBaseURL + $"UpdateItemQuantity/{_item.Name}/{_item.StoreID}";
+            _item.Quantity += _quantity;
+            string serializedItem = JsonSerializer.Serialize(_item);
+            StringContent content = new StringContent(serializedItem, Encoding.UTF8, "application/json");
+            HttpClient client = new HttpClient();
+            try
+            {
+                HttpResponseMessage response = await client.PutAsync(url, content);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
             //http put
         //update item quantity
         }

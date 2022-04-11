@@ -13,7 +13,7 @@ public interface IRepo
     Task SaveFoodInventoryAsync();
     Task <JAModel.ShopItem> SearchInventoryAsync(string itemName, int storeID);
     Task<List<JAModel.Store>> GetStoresAsync(); 
-    Task UpdateFoodItemAsync(JAModel.ShopItem _item, int _additionalQuantity);
+    Task UpdateFoodItemAsync(JAModel.ShopItem _item);
     Task CreateNewStoreAsync(JAModel.Store _newStore);
     Task ChangePriceAsync(JAModel.ShopItem _item, float _price, int storeID);
     Task RemoveItemAsync(JAModel.ShopItem _item, int storeID);
