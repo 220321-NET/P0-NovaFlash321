@@ -147,7 +147,20 @@ namespace ConsoleProjectUI
                 Console.WriteLine(e.Message);
             }
         }
-
+        #region  Functions to Add
+        //search for order
+        //remove order cart
+        //remove order item
+        //get store name
+        //save order to json
+        //search for order from json
+        //confirm order
+        //check order history
+        //change store
+        //create new user
+        //create new admin
+        //update item quantity
+        #endregion
     }
 }
 

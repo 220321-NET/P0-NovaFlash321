@@ -68,7 +68,7 @@ namespace JAConsole;
                             await CheckUserAsync();
                             if(hasAdminPrivilages || hasUserPrivilages)
                             {
-                                UserMainMenu();
+                                await UserMainMenu();
                             }
                             else
                             {
@@ -92,7 +92,7 @@ namespace JAConsole;
                 }
             }while(!isValid);
         }
-        private void CreateNewUser()
+        private async Task CreateNewUser()
         {
             CreateName:
             Console.WriteLine("Enter your username:");
@@ -130,8 +130,7 @@ namespace JAConsole;
                     goto EnterLN;
                 }
             EnterStore:
-            List<Store> allStores = new List<Store>(); 
-            //_bl.GetStores();
+            List<Store> allStores = await httpService.GetStoresAsync();
             Console.WriteLine("Enter the franchise you are shopping at (this can be changed later):");
             foreach(Store _storeName in allStores)
             {
@@ -154,8 +153,7 @@ namespace JAConsole;
             StoreID = int.Parse(uStore),
 
         };
-        List<UserPass> allUsers = new List<UserPass>();
-        //_bl.GetAllUsers();
+        List<UserPass> allUsers = await httpService.GetUsersAsync();
         foreach(UserPass _user in allUsers)
         {
             if(_user.UserName == tempUser.UserName)
@@ -214,7 +212,7 @@ namespace JAConsole;
             }
             
             List<UserPass> allAdmins = await httpService.GetAdminsAsync();
-            //_bl.GetAllAdmins();
+            
 
             for(int i = 0; i < allAdmins.Count; i++)
             {
@@ -909,7 +907,7 @@ namespace JAConsole;
         }
     }
 
-private void UserMainMenu()
+private async Task UserMainMenu()
 {
     bool loggedIn = true;
     do
@@ -934,7 +932,7 @@ AdminMenu:
         
         switch(initInput)
         {
-            case '1': PlaceNewOrder(); break;
+            case '1': await PlaceNewOrderAsync(); break;
             case '2': RemoveOrderItem(); break;
             case '3': ConfirmOrder(); break;
             case '4': CheckOrderHistory(); break;
@@ -963,7 +961,7 @@ private List<ShopItem> SearchForOrder()
 
     return orderContents;
 }
-    private void PlaceNewOrder()
+    private async Task PlaceNewOrderAsync()
     {
 
         List<ShopItem> orderContents = SearchForOrder();
@@ -972,7 +970,7 @@ private List<ShopItem> SearchForOrder()
         {
             Console.WriteLine("No order was found! Creating a new order");
             orderContents = new List<ShopItem>();
-            AddOrderItem(orderContents);
+            await AddOrderItemAsync(orderContents);
         }
         else
         {   
@@ -990,20 +988,20 @@ private List<ShopItem> SearchForOrder()
             switch(input)
             {
                 case 'Y': 
-                AddOrderItem(orderContents);
+                await AddOrderItemAsync(orderContents);
                 break;
                 case 'N': 
                 Console.WriteLine("Creating new order");
                 orderContents = new List<ShopItem>();
-                AddOrderItem(orderContents);
+                await AddOrderItemAsync(orderContents);
                 break;
                 default: Console.WriteLine("Invalid Response!"); goto PNOYesNo;
             };
         }
     }   
-private void AddOrderItem(List<ShopItem> _order)
+private async Task AddOrderItemAsync(List<ShopItem> _order)
 {
-        string _storeName = ""; 
+        string _storeName = "";
         //_bl.GetStoreName(currentUser.UserID);
         bool isOrdering = true;
         Console.WriteLine($"You are currently shopping at: {_storeName}");
@@ -1023,8 +1021,9 @@ private void AddOrderItem(List<ShopItem> _order)
         foodItem = foodItem.Replace(foodItem[0], upper);
 
         ShopItem searchedItem = new ShopItem(); 
-        //_bl.SearchInventory(foodItem);
-        if(searchedItem.Id == 0 || searchedItem.Id == null)
+        
+        await httpService.SearchInventoryAsync(foodItem, currentUser.StoreID);
+        if(searchedItem.Id == 0)
         {
             Console.WriteLine("Item does not exist!");
         }
@@ -1196,10 +1195,9 @@ private void CheckOrderHistory()
         
     
 }
-private void ChangeStore()
+private async Task ChangeStore()
 {
-    List<Store> allStores = new List<Store>(); 
-    //_bl.GetStores();
+    List<Store> allStores = await httpService.GetStoresAsync();
     Console.WriteLine("Select the store you want to redirect to by its number:");
     foreach(Store _store in allStores)
     {
