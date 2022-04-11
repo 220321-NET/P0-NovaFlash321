@@ -108,7 +108,7 @@ namespace ConsoleProjectUI
                 Console.WriteLine(e.Message);
             }
 
-            return new List<Store>();
+            return allStores;
         }
 
         public async Task CreateNewFoodItemAsync(ShopItem _shopItem, int storeID)
@@ -148,19 +148,96 @@ namespace ConsoleProjectUI
             }
         }
         #region  Functions to Add
-        //search for order
-        //remove order cart
-        //remove order item
-        //get store name
-        //save order to json
+
+
+        public async Task<List<ShopItem>> SearchForOrderAsync()
+        {
+
+            //potentially gets an SQL table? ask Juniper
+            //http get
         //search for order from json
+        return new List<ShopItem>();
+        }
+
+        public async Task<string> GetStoreNameAsync(int userID)
+        {   
+            //http get
+            Store _store = new Store();
+            return "";
+        //get store name
+        }
+
+        public async Task RemoveOrderCartAsync()
+        {
+        //potentially gets an SQL table? ask Juniper
+        //remove order cart
+        }
+
+        
+        public async Task SaveOrderAsync(List<ShopItem> _order)
+        {
+            //potentially gets an SQL table? ask Juniper
+
+        //save order to json
+        }
+
+        public async Task ConfirmOrderAsync(List<ShopItem> _order, int _storeID, int _userID)
+        {
+            //http put
         //confirm order
+        } 
+
+        public async Task<Dictionary<int,string>> CheckOrderHistoryAsync(int _select, int _userID)
+        {
+            //http get
         //check order history
+            return new Dictionary<int, string>();
+        }
+
+        public async Task ChangeStoreAsync(int _storeID, UserPass _currentUser)
+        {
+            string url = _apiBaseURL + "ChangeStore";
+            _currentUser.StoreID = _storeID;
+            string serializedItem = JsonSerializer.Serialize(_currentUser);
+            StringContent content = new StringContent(serializedItem, Encoding.UTF8, "application/json");
+            HttpClient client = new HttpClient();
+            try
+            {
+                HttpResponseMessage response = await client.PutAsync(url, content);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            //http put
         //change store
+        }
+
+
+        public async Task CreateNewUserAsync(UserPass _tempUser)
+        {
+            //http post
         //create new user
+        }
+
+        public async Task CreateNewAdminAsync(UserPass _tempAdmin)
+        {
+            //http post
         //create new admin
+        }
+
+        public async Task UpdateItemQuantityAsync(ShopItem _item, int _quantity)
+        {
+            //http put
         //update item quantity
+        }
         #endregion
+
+        public async Task RemoveItem(ShopItem _searchedItem, int _storeID)
+        {
+
+        }
     }
 }
 

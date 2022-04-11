@@ -57,7 +57,7 @@ public class DBRespository : IRepo
 
 
 
-    public void CreateNewAdmin(JAModel.UserPass _newAdmin)
+    public async Task CreateNewAdminAsync(JAModel.UserPass _newAdmin)
     {
         SqlConnection connection = new SqlConnection(_connectionString);
         connection.Open();
@@ -79,7 +79,7 @@ public class DBRespository : IRepo
         }
     }
 
-    public void CreateNewUser(JAModel.UserPass _newUser)
+    public async Task CreateNewUserAsync(JAModel.UserPass _newUser)
     {
         SqlConnection connection = new SqlConnection(_connectionString);
         connection.Open();
@@ -105,7 +105,7 @@ public class DBRespository : IRepo
         //        cmd = new SqlCommand("INSERT INTO ShopItem(productName, productPrice, productQuantity, productType, storeID) OUTPUT INSERTED.productID VALUES(@name, @price, @quantity, @type, @storeid)", connection);
     }
 
-    public List<JAModel.Store> GetStores()
+    public async Task<List<JAModel.Store>> GetStoresAsync()
     {
         List<JAModel.Store> allStores = new List<JAModel.Store>();
         SqlConnection connection = new SqlConnection(_connectionString);
@@ -176,7 +176,7 @@ public class DBRespository : IRepo
         return allUsers;
     }
 
-    public void SaveAdmins()
+    public async Task SaveAdminsAsync()
     {
 
     }
@@ -189,7 +189,7 @@ public class DBRespository : IRepo
 
 
 #region FUNCTIONAL 
-    public void UpdateFoodItem(JAModel.ShopItem _item, int _additionalQuantity)
+    public async Task UpdateFoodItemAsync(JAModel.ShopItem _item, int _additionalQuantity)
     {
         //Closed connection
         int quantity = 0;
@@ -307,7 +307,7 @@ public class DBRespository : IRepo
         connection.Close();
         return allFood;
     }
-    public async Task CreateNewFoodItem(JAModel.ShopItem _shopItem) 
+    public async Task CreateNewFoodItemAsync(JAModel.ShopItem _shopItem) 
     {
         SqlConnection connection = new SqlConnection(_connectionString);
         connection.Open();
@@ -354,7 +354,7 @@ public class DBRespository : IRepo
 
         connection.Close();
     }
-    public void SaveFoodInventory()
+    public async Task SaveFoodInventoryAsync()
     {
 
     }
@@ -401,7 +401,7 @@ public class DBRespository : IRepo
     }
 
     
-    public void RemoveItem(JAModel.ShopItem _item, int storeID)
+    public async Task RemoveItemAsync(JAModel.ShopItem _item, int storeID)
     {
         SqlConnection connection = new SqlConnection(_connectionString);
         connection.Open();
@@ -442,7 +442,7 @@ public class DBRespository : IRepo
         connection.Close();
     }
 
-    public void ChangeStore(int _newID, JAModel.UserPass _currentUser)
+    public async Task ChangeStoreAsync(int _newID, JAModel.UserPass _currentUser)
     {
         SqlConnection connection = new SqlConnection(_connectionString);
         connection.Open();
@@ -453,17 +453,19 @@ public class DBRespository : IRepo
 
         try
         {
-            _currentUser.UserID = (int)cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQuery();
+            //_currentUser.UserID = (int)cmd.ExecuteNonQuery();
         }
         catch(Exception e)
         {
+            Console.WriteLine(e.Message);
             Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
         }
         connection.Close();
     }
 
 
-    public void SaveOrder(List<JAModel.ShopItem> _order)
+    public async Task SaveOrderAsync(List<JAModel.ShopItem> _order)
     {
         string jsonContents = JsonSerializer.Serialize(_order);
         File.WriteAllText(orderFilePath, jsonContents);
@@ -471,7 +473,7 @@ public class DBRespository : IRepo
             
     }
 
-    public List<JAModel.ShopItem> SearchForOrder()
+    public async Task<List<JAModel.ShopItem>> SearchForOrderAsync()
     {
         string jsonContents = "";
         try
@@ -495,12 +497,12 @@ public class DBRespository : IRepo
 
         return _order;
     }
-    public void AddOrderItem()
+    public async Task AddOrderItemAsync()
     {   
 
     }
 
-    public string GetStoreName(int userID)
+    public async Task<string> GetStoreNameAsync(int userID)
     {
         SqlConnection connection = new SqlConnection(_connectionString);
         connection.Open();
@@ -515,12 +517,12 @@ public class DBRespository : IRepo
         return _storeName;
     }
 
-        public void RemoveOrder()
+        public async Task RemoveOrderAsync()
     {
         string jsonContents = "[]";
         File.WriteAllText(orderFilePath, jsonContents);
     }
-    public void ConfirmOrder(List<JAModel.ShopItem> _order, int storeID, int userID)
+    public async Task ConfirmOrderAsync(List<JAModel.ShopItem> _order, int storeID, int userID)
     {
         List<JAModel.ShopItem> _curInventory = new List<JAModel.ShopItem>();
         SqlConnection connection = new SqlConnection(_connectionString);
@@ -631,7 +633,7 @@ public class DBRespository : IRepo
 /// <param name="_select">Sort option for switch case</param>
 /// <param name="_userID">Gets current ID from that is logged in</param>
 /// <returns>Currently returns list of strings that describe orders, but needs to return dictionary</returns>
-    public Dictionary<int, string> CheckOrderHistory(int _select, int _userID)
+    public async Task<Dictionary<int, string>> CheckOrderHistoryAsync(int _select, int _userID)
     {
         Dictionary<int,string> orderHistory = new Dictionary<int, string>();
         SqlConnection connection = new SqlConnection(_connectionString);

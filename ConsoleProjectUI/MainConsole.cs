@@ -56,7 +56,7 @@ namespace JAConsole;
                             await CheckAdminAsync(); 
                             if(hasAdminPrivilages)
                             {
-                                await AdminMainMenu();
+                                await AdminMainMenuAsync();
                                 break;
                             }
                             else
@@ -76,7 +76,7 @@ namespace JAConsole;
                             }
                             break;
                         case '3':
-                            CreateNewUser();
+                            await CreateNewUserAsync();
                             break;
                         case 'x':
                             Console.WriteLine("Goodbye!"); 
@@ -92,7 +92,7 @@ namespace JAConsole;
                 }
             }while(!isValid);
         }
-        private async Task CreateNewUser()
+        private async Task CreateNewUserAsync()
         {
             CreateName:
             Console.WriteLine("Enter your username:");
@@ -169,14 +169,14 @@ namespace JAConsole;
         else
         {
         }
-
-        //_bl.CreateNewUser(tempUser);
+        await httpService.CreateNewUserAsync(tempUser);
+        
 
         
 
 
 }
-        private async Task CheckAdminAsync() //Log in as admin
+        private async Task CheckAdminAsync()
         {
             bool userIsValid = false;
             bool passIsValid =  false;
@@ -221,6 +221,7 @@ namespace JAConsole;
                     Console.WriteLine("Valid login! Welcome back " + allAdmins[i].FirstName +" " + allAdmins[i].LastName);
                     currentUser = allAdmins[i];
                     hasAdminPrivilages =  true;
+                    currentUser.IsAdmin = hasAdminPrivilages;
                     break;
                 }
                 else
@@ -234,7 +235,7 @@ namespace JAConsole;
 
             return;
         }
-        private async Task CheckUserAsync() //Log in as user
+        private async Task CheckUserAsync()
         {
             string userInput = "";
             string passInput = "";
@@ -270,7 +271,7 @@ namespace JAConsole;
             }
 
             List<UserPass> allUsers = await httpService.GetUsersAsync();
-            //_bl.GetAllUsers();
+            
             for(int i = 0; i < allUsers.Count; i++)
             {
                 if(userInput == allUsers[i].UserName && passInput == allUsers[i].PassWord)
@@ -292,7 +293,7 @@ namespace JAConsole;
             
             return;
         }        
-    private async Task AdminMainMenu()
+    private async Task AdminMainMenuAsync()
     {
         bool loggedIn = true;
         do{
@@ -324,7 +325,7 @@ namespace JAConsole;
             case '3': await ChangePriceAsync(); break;
             case '4': await CreateNewAdminAsync(); break;
             case '5': await CreateNewStoreAsync(); break;
-            case '6': ChangeStore(); break;
+            case '6': await ChangeStore(); break;
             case 'x':
                 Console.WriteLine("Returning to Login"); 
                 loggedIn = false;
@@ -499,7 +500,7 @@ namespace JAConsole;
             LastName = aLast,
             StoreID = int.Parse(aStore),
         };
-        List<UserPass> allAdmins = new List<UserPass>(); //_bl.GetAllAdmins();
+        List<UserPass> allAdmins = await httpService.GetAdminsAsync(); //_bl.GetAllAdmins();
         foreach(UserPass _admin in allAdmins)
         {
             if(_admin.UserName == newAdmin.UserName)
@@ -508,10 +509,11 @@ namespace JAConsole;
                 return;
             }
         }
+        await httpService.CreateNewAdminAsync(newAdmin);
         //_bl.CreateNewAdmin(newAdmin);
 
     }
-    private void UpdateItem(ShopItem _item)
+    private async Task UpdateItemAsync(ShopItem _item)
     {
         int quantity = 0;
         char input = '1';
@@ -545,6 +547,7 @@ namespace JAConsole;
                 switch(input)
                 {
                     case 'Y': 
+                        await httpService.UpdateItemQuantityAsync(_item, quantity);
                         //_bl.UpdateFoodItem(_item, quantity);
                         break;
                     case 'N':
@@ -689,7 +692,7 @@ namespace JAConsole;
                 switch(input)
                 {
                     case 'Y': 
-                        UpdateItem(searchedItem);
+                        await UpdateItemAsync(searchedItem);
                         break;
                     case 'N':
                         Console.WriteLine("Returning to Admin Menu!");
@@ -822,6 +825,7 @@ namespace JAConsole;
                 switch(input)
                 {
                     case 'Y': 
+                        await httpService.RemoveItem(searchedItem, currentUser.StoreID);
                         //_bl.RemoveItem(searchedItem, currentUser.StoreID);
                         break;
                     case 'N': 
@@ -933,10 +937,10 @@ AdminMenu:
         switch(initInput)
         {
             case '1': await PlaceNewOrderAsync(); break;
-            case '2': RemoveOrderItem(); break;
-            case '3': ConfirmOrder(); break;
-            case '4': CheckOrderHistory(); break;
-            case '5': ChangeStore(); break;
+            case '2': await RemoveOrderItem(); break;
+            case '3': await ConfirmOrderAsync(); break;
+            case '4': await CheckOrderHistoryAsync(); break;
+            case '5': await ChangeStore(); break;
             case 'x':
                 Console.WriteLine("Returning to Login"); 
                 return;
@@ -951,20 +955,20 @@ AdminMenu:
 
         }
     }while(loggedIn);
+    await httpService.RemoveOrderCartAsync();
     //_bl.RemoveOrder(); //Removes order history when logged out
 }
 
-private List<ShopItem> SearchForOrder()
+private async Task<List<ShopItem>> SearchForOrderAsync()
 {
-    List<ShopItem> orderContents = new List<ShopItem>(); 
-    //_bl.SearchForOrder();
+    List<ShopItem> orderContents = await httpService.SearchForOrderAsync();
 
     return orderContents;
 }
     private async Task PlaceNewOrderAsync()
     {
 
-        List<ShopItem> orderContents = SearchForOrder();
+        List<ShopItem> orderContents = await SearchForOrderAsync();
         
         if(orderContents.Count == 0 || orderContents == null)
         {
@@ -1001,8 +1005,8 @@ private List<ShopItem> SearchForOrder()
     }   
 private async Task AddOrderItemAsync(List<ShopItem> _order)
 {
-        string _storeName = "";
-        //_bl.GetStoreName(currentUser.UserID);
+        string _storeName = await httpService.GetStoreNameAsync(currentUser.UserID);
+        
         bool isOrdering = true;
         Console.WriteLine($"You are currently shopping at: {_storeName}");
         do
@@ -1076,14 +1080,14 @@ private async Task AddOrderItemAsync(List<ShopItem> _order)
                         break;
                 }
         }
-
+        await httpService.SaveOrderAsync(_order);
         //_bl.SaveOrder(_order);
         }while(isOrdering);
 }
 
-private void RemoveOrderItem()
+private async Task RemoveOrderItem()
 {
-    List<ShopItem> _order = SearchForOrder();
+    List<ShopItem> _order = await SearchForOrderAsync();
     if(_order.Count > 0)
     {
         Console.WriteLine("Your current order:");
@@ -1119,10 +1123,10 @@ private void RemoveOrderItem()
         Console.WriteLine("No order found!");
     }
 }
-private void ConfirmOrder()
+private async Task ConfirmOrderAsync()
 {
     List<ShopItem> _order = new List<ShopItem>(); 
-    //_bl.SearchForOrder();
+    //_bl.SearchForOrderAsync();
     if(_order.Count > 0)
     {
 
@@ -1147,6 +1151,7 @@ private void ConfirmOrder()
                 switch(input)
                 {
                     case 'Y':
+                    await httpService.ConfirmOrderAsync(_order, currentUser.StoreID, currentUser.UserID);
                     //_bl.ConfirmOrder(_order, currentUser.StoreID, currentUser.UserID);
                     break;
                     case 'N':
@@ -1159,7 +1164,7 @@ private void ConfirmOrder()
     }
 }
 
-private void CheckOrderHistory()
+private async Task CheckOrderHistoryAsync()
 {
     COHValidation:
     Console.WriteLine("How do you wish to view your order history?");
@@ -1180,6 +1185,7 @@ private void CheckOrderHistory()
     if(select >= 1 && select <= 4)
     {
         Dictionary<int, string> orderHistory = new Dictionary<int, string>(); 
+        await httpService.CheckOrderHistoryAsync(select, currentUser.UserID);
         //_bl.CheckOrderHistory(select, currentUser.UserID);
         foreach(KeyValuePair<int,string> _order in orderHistory)
         {
@@ -1218,6 +1224,7 @@ private async Task ChangeStore()
     else
     {
         int storeID = int.Parse(uInput);
+        await httpService.ChangeStoreAsync(storeID, currentUser);
         //_bl.ChangeStore(storeID, currentUser);
     }
 

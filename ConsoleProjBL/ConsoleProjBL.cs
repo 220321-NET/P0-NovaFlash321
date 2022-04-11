@@ -4,27 +4,27 @@ namespace JAConsoleBL;
 
 public class ConsoleProjBL : IJABL 
 { 
-    public void ChangeStore(int _newID, JAModel.UserPass _currentUser)
+    public async Task ChangeStoreAsync(int _newID, JAModel.UserPass _currentUser)
     {
-        _repo.ChangeStore(_newID, _currentUser);
+        await _repo.ChangeStoreAsync(_newID, _currentUser);
     }
     private readonly IRepo _repo;
     public ConsoleProjBL(IRepo repo)
     {
         _repo = repo;
     }
-    public void CreateNewAdmin(UserPass _newAdmin)
+    public async Task CreateNewAdminAsync(UserPass _newAdmin)
     {
-            _repo.CreateNewAdmin(_newAdmin);
+            await _repo.CreateNewAdminAsync(_newAdmin);
     }
 
-    public void SaveOrder(List<JAModel.ShopItem> _order)
+    public async Task SaveOrderAsync(List<JAModel.ShopItem> _order)
     {
-        _repo.SaveOrder(_order);
+        await _repo.SaveOrderAsync(_order);
     }
-    public  void RemoveItem(JAModel.ShopItem _item, int storeID)
+    public  async Task RemoveItemAsync(JAModel.ShopItem _item, int storeID)
     {
-        _repo.RemoveItem(_item, storeID);
+        await _repo.RemoveItemAsync(_item, storeID);
     }
 
     public async Task<List<UserPass>> GetAllAdminsAsync()
@@ -37,9 +37,9 @@ public class ConsoleProjBL : IJABL
     {
         return await _repo.GetAllUsersAsync();
     }
-    public void SaveAdmins()
+    public async Task SaveAdminsAsync()
     {
-        _repo.SaveAdmins();
+        await _repo.SaveAdminsAsync();
     }
     
 
@@ -49,18 +49,18 @@ public class ConsoleProjBL : IJABL
         return await _repo.GetFoodInventoryAsync();
     }
 
-    public async Task CreateNewFoodItem(ShopItem _shopItem)
+    public async Task CreateNewFoodItemAsync(ShopItem _shopItem)
     {
-        await _repo.CreateNewFoodItem(_shopItem);
+        await _repo.CreateNewFoodItemAsync(_shopItem);
     }
 
-public void UpdateFoodItem(JAModel.ShopItem _item, int _additionalQuantity)
+public async Task UpdateFoodItemAsync(JAModel.ShopItem _item, int _additionalQuantity)
     {
-        _repo.UpdateFoodItem(_item, _additionalQuantity);
+        await _repo.UpdateFoodItemAsync(_item, _additionalQuantity);
     }
-    public void SaveFoodInventory()
+    public async Task SaveFoodInventoryAsync()
     {
-        _repo.SaveFoodInventory();
+        await _repo.SaveFoodInventoryAsync();
     }
 
     public async Task <JAModel.ShopItem> SearchInventoryAsync(string itemName, int storeID)
@@ -68,14 +68,14 @@ public void UpdateFoodItem(JAModel.ShopItem _item, int _additionalQuantity)
 
         return await _repo.SearchInventoryAsync(itemName, storeID);
     }
-    public void CreateNewUser(JAModel.UserPass _newUser)
+    public async Task CreateNewUserAsync(JAModel.UserPass _newUser)
     {
-        _repo.CreateNewUser(_newUser);
+        await _repo.CreateNewUserAsync(_newUser);
     }
 
-    public List<Store> GetStores()
+    public async Task<List<Store>> GetStoresAsync()
     {
-        return _repo.GetStores();
+        return await _repo.GetStoresAsync();
     }
     public async Task CreateNewStoreAsync(JAModel.Store _newStore)
     {
@@ -90,30 +90,30 @@ public void UpdateFoodItem(JAModel.ShopItem _item, int _additionalQuantity)
 
     #region UserMenu
 
-public List<JAModel.ShopItem> SearchForOrder()
+public async Task<List<JAModel.ShopItem>> SearchForOrderAsync()
 {
-    return _repo.SearchForOrder();
+    return await _repo.SearchForOrderAsync();
 }
-public void AddOrderItem()
+public async Task AddOrderItemAsync()
 {
-_repo.AddOrderItem();
+    await _repo.AddOrderItemAsync();
 }
 
-public void RemoveOrder()
+public async Task RemoveOrderAsync()
 {
-_repo.RemoveOrder();
+    await _repo.RemoveOrderAsync();
 }
-public void ConfirmOrder(List<JAModel.ShopItem> _order, int storeID, int userID)
+public async Task ConfirmOrderAsync(List<JAModel.ShopItem> _order, int storeID, int userID)
 {
-    _repo.ConfirmOrder(_order, storeID, userID);
+    await _repo.ConfirmOrderAsync(_order, storeID, userID);
 }
-public string GetStoreName(int userID)
+public async Task<string> GetStoreNameAsync(int userID)
 {
-    return _repo.GetStoreName(userID);
+    return await _repo.GetStoreNameAsync(userID);
 }
-public Dictionary<int, string> CheckOrderHistory(int _select, int _userID)
+public async Task< Dictionary<int, string>> CheckOrderHistoryAsync(int _select, int _userID)
 {
-    return _repo.CheckOrderHistory(_select, _userID);
+    return await _repo.CheckOrderHistoryAsync(_select, _userID);
 }
 
 

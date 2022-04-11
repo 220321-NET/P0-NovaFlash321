@@ -70,6 +70,19 @@ namespace WebAPI.Controllers
             await _bl.ChangePriceAsync(searchedItem, newPrice, storeID);
         }
 
+        [HttpPut("ChangeStore")]
+        public async Task ChangeStoreAsync(UserPass _currentUser)
+        {
+            int _store = _currentUser.StoreID;
+            await _bl.ChangeStoreAsync(_store, _currentUser);
+        }
+
+        [HttpPost("CreateNewUser")]
+        public async Task CreateNewUserAsync(UserPass _tempUser)
+        {
+            await _bl.CreateNewUserAsync(_tempUser);
+        }
+
         //[HttpGet]
         //public Dictionary<int, string> CheckOrderHistory(int _select, int _userID)
         //{
