@@ -115,9 +115,11 @@ namespace WebAPI.Controllers
         }
 
         // DELETE api/<ItemController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("RemoveInventoryItem/{itemName}/{storeID}")]
+        public async Task RemoveInventoryItemAsync(ShopItem _item, int storeID)
         {
+            await _bl.RemoveItemAsync(_item, _item.StoreID);
+
         }
     }
 

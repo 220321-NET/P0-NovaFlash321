@@ -276,6 +276,21 @@ namespace ConsoleProjectUI
 
         public async Task RemoveItem(ShopItem _searchedItem, int _storeID)
         {
+            string url = _apiBaseURL + $"RemoveInventoryItem/{_searchedItem.Name}/{_storeID}";
+            _searchedItem.StoreID = _storeID;
+            string serializedItem = JsonSerializer.Serialize(_searchedItem);
+            StringContent content = new StringContent(serializedItem, Encoding.UTF8, "application/json");
+            HttpClient client = new HttpClient();
+            //ERROR 405, Unsupported Media Type
+            try
+            {
+                HttpResponseMessage response = await client.DeleteAsync(url);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
         }
     }
