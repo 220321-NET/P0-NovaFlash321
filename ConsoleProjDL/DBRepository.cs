@@ -28,6 +28,7 @@ private readonly string _connectionString;
 
 public DBRespository(string connectionString)
 {
+    Console.WriteLine(connectionString);
 _connectionString = connectionString;
 }
 
