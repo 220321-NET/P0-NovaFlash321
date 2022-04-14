@@ -409,7 +409,7 @@ connection.Open();
 SqlCommand cmd = new SqlCommand();
 cmd = new SqlCommand("DELETE FROM ShopItem WHERE productName = @name AND storeID = @storeid",connection);
 cmd.Parameters.AddWithValue("@name", _item.Name);
-cmd.Parameters.AddWithValue("storeid", storeID);
+cmd.Parameters.AddWithValue("@storeid", storeID);
 
 try
 {
@@ -466,42 +466,68 @@ connection.Close();
 }
 
 
-public async Task SaveOrderAsync(List<JAModel.ShopItem> _order)
+public async Task SaveOrderAsync(JAModel.ShopItem _item, int cartID, int userID, int productQuantity)
 {
-string jsonContents = JsonSerializer.Serialize(_order);
-File.WriteAllText(orderFilePath, jsonContents);
+// string jsonContents = JsonSerializer.Serialize(_order);
+// File.WriteAllText(orderFilePath, jsonContents);
+    SqlConnection connection = new SqlConnection(_connectionString);
+    connection.Open();
+    SqlCommand cmd = new SqlCommand();
+    cmd = new SqlCommand("INSERT INTO CartInstance(cartID, userID, productID, storeID, productQuantity) VALUES(@cartid, @userid, @productid, @storeid, @productquantity)", connection);
+    cmd.Parameters.AddWithValue("@cartid", cartID);
+    cmd.Parameters.AddWithValue("@userid", userID);
+    cmd.Parameters.AddWithValue("@productid", _item.Id);
+    cmd.Parameters.AddWithValue("@storeid", _item.StoreID);
+    cmd.Parameters.AddWithValue("@productquantity", productQuantity);
+    try
+    {
+        cmd.ExecuteNonQuery();
+    }
+    catch(Exception e)
+    {
+        LogError(e);
+    }
+    connection.Close();
+}
 
+public async Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(int userID)
+{
+    List<JAModel.ShopItem> _orderContents = new List<JAModel.ShopItem>();
+    JAModel.ShopItem _item = new JAModel.ShopItem();
     
-}
+    int _cartid = 0;
+    SqlConnection connection = new SqlConnection(_connectionString);
+    connection.Open();
+    SqlCommand cmd = new SqlCommand();
+    cmd = new SqlCommand("SELECT * FROM CartInstance WHERE userID = @userid",connection);
+    cmd.Parameters.AddWithValue("@userid", userID);
+    SqlDataReader reader = cmd.ExecuteReader();
+    while(reader.Read())
+    {
+        _cartid = reader.GetInt32(0);
+        int productID = reader.GetInt32(2);
+        int storeID = reader.GetInt32(3);
+        int quantity = reader.GetInt32(4);
+        string productName = reader.GetString(5);
 
-public async Task<List<JAModel.ShopItem>> SearchForOrderAsync()
-{
-string jsonContents = "";
-try
-{
-    jsonContents = File.ReadAllText(orderFilePath);
+        _item = new JAModel.ShopItem
+        {
+            Id = productID,
+            StoreID = storeID,
+            Quantity = quantity,
+            Name = productName,
+        };
+        _orderContents.Add(_item);
+    }
+    Dictionary<int, List<JAModel.ShopItem>> order = new Dictionary<int, List<JAModel.ShopItem>>();
+    order.Add(_cartid, _orderContents);
+    connection.Close();
+    return order;
 }
-catch(Exception e)
-{
-    Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
-}
-List<JAModel.ShopItem> _order = new List<JAModel.ShopItem>();
-try
-{
-    _order = JsonSerializer.Deserialize<List<JAModel.ShopItem>>(jsonContents) ?? new List<JAModel.ShopItem>();
+    public async Task AddOrderItemAsync()
+    {   
 
-}
-catch(Exception e)
-{
-    Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
-}
-
-return _order;
-}
-public async Task AddOrderItemAsync()
-{   
-
-}
+    }
 
 public async Task<string> GetStoreNameAsync(int userID)
 {
@@ -719,12 +745,32 @@ SELECT OrderHistory.orderID, OrderHistory.orderDate, OrderHistory.orderCost, Ord
 
 }
 
-private void LogError(Exception e)
-{
-string jsonContents = JsonSerializer.Serialize(e.Message);
-File.WriteAllText(errorFilePath, jsonContents);
+    public async Task CreateOrderAsync(int userID)
+    {
+        SqlConnection connection = new SqlConnection(_connectionString);
+        connection.Open();
+        SqlCommand cmd = new SqlCommand();
+        cmd = new SqlCommand("INSERT INTO Carts(userID) VALUES (@userID)", connection);
+        cmd.Parameters.AddWithValue("@userID",userID);
+        try
+        {
+            cmd.ExecuteNonQuery();
+        }
+        catch(Exception e)
+        {
+            LogError(e);
+        }
+    }
 
-}
+    
+
+
+    private void LogError(Exception e)
+    {
+    string jsonContents = JsonSerializer.Serialize(e.Message);
+    File.WriteAllText(errorFilePath, jsonContents);
+
+    }
 
 }
 

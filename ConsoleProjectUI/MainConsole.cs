@@ -955,26 +955,31 @@ AdminMenu:
 
         }
     }while(loggedIn);
-    await httpService.RemoveOrderCartAsync();
+    //await httpService.RemoveOrderCartAsync();
     //_bl.RemoveOrder(); //Removes order history when logged out
 }
 
-private async Task<List<ShopItem>> SearchForOrderAsync()
+
+
+private async Task<Dictionary<int, List<ShopItem>>> SearchForOrderAsync(int userID)
 {
-    List<ShopItem> orderContents = await httpService.SearchForOrderAsync();
+    Dictionary<int, List<ShopItem>> orderContents = await httpService.SearchForOrderAsync(currentUser.UserID);
+    
 
     return orderContents;
 }
     private async Task PlaceNewOrderAsync()
     {
-
-        List<ShopItem> orderContents = await SearchForOrderAsync();
+        Dictionary<int, List<ShopItem>> orderCart = await SearchForOrderAsync(currentUser.UserID);
+        List<ShopItem> orderContents = orderCart[1];
+        //List<ShopItem> orderContents = await SearchForOrderAsync();
         
         if(orderContents.Count == 0 || orderContents == null)
         {
             Console.WriteLine("No order was found! Creating a new order");
-            orderContents = new List<ShopItem>();
-            await AddOrderItemAsync(orderContents);
+            
+            //orderCart = new Dictionary<int, List<ShopItem>>();
+            //await AddOrderItemAsync(orderContents);
         }
         else
         {   
@@ -996,6 +1001,9 @@ private async Task<List<ShopItem>> SearchForOrderAsync()
                 break;
                 case 'N': 
                 Console.WriteLine("Creating new order");
+
+                //orderContents = new Dictionary<int, List<ShopItem>>();
+
                 orderContents = new List<ShopItem>();
                 await AddOrderItemAsync(orderContents);
                 break;
@@ -1005,6 +1013,7 @@ private async Task<List<ShopItem>> SearchForOrderAsync()
     }   
 private async Task AddOrderItemAsync(List<ShopItem> _order)
 {
+    ShopItem _tempItem = new ShopItem();
         string _storeName = await httpService.GetStoreNameAsync(currentUser.UserID);
         
         bool isOrdering = true;
@@ -1050,7 +1059,7 @@ private async Task AddOrderItemAsync(List<ShopItem> _order)
             {
                 int quantity = int.Parse(quantityInput);
                 Console.WriteLine($"Adding [{quantityInput}] to current order. Price is $" + (quantity * searchedItem.Price).ToString("###.00"));
-                JAModel.ShopItem _tempItem = new ShopItem()
+                _tempItem = new ShopItem()
                 {
                     Name = searchedItem.Name,
                     Quantity = quantity,
@@ -1080,21 +1089,26 @@ private async Task AddOrderItemAsync(List<ShopItem> _order)
                         break;
                 }
         }
-        await httpService.SaveOrderAsync(_order);
+        await httpService.SaveOrderAsync(_tempItem, 0, currentUser.UserID, _tempItem.Quantity);
         //_bl.SaveOrder(_order);
         }while(isOrdering);
 }
 
 private async Task RemoveOrderItem()
 {
-    List<ShopItem> _order = await SearchForOrderAsync();
+    Dictionary<int, List<ShopItem>> _orderCart = await SearchForOrderAsync(currentUser.UserID);
+    List<ShopItem> _order = _orderCart[0];
     if(_order.Count > 0)
     {
         Console.WriteLine("Your current order:");
         int index = 1;
-        foreach(ShopItem _item in _order)
+        foreach(ShopItem _shopItem in _order)
         {
-            Console.WriteLine($"Item #{index}: {_item.Quantity} {_item.Name}, $" + (_item.Price * _item.Quantity).ToString("###.00"));
+            
+            
+            Console.WriteLine($"Item #{index}: {_shopItem.Quantity} {_shopItem.Name}, $" + (_shopItem.Price * _shopItem.Quantity).ToString("###.00"));
+
+            
             index++;
         }
         ROIValidation:
@@ -1109,7 +1123,7 @@ private async Task RemoveOrderItem()
         int indexInput = input - '0';
         if((indexInput - 1) < _order.Count)
         {
-            _order.RemoveAt(indexInput - 1);
+            //_order.RemoveAt(indexInput - 1);
             //_bl.SaveOrder(_order);
         }
         else

@@ -82,7 +82,7 @@ public interface IJABL
     /// Searches if an order exists with the user that is currently logged in
     /// </summary>
     /// <returns>Returns a list that the user can resume shopping with</returns>
-    Task<List<JAModel.ShopItem>> SearchForOrderAsync();
+    Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(int userID);
     Task AddOrderItemAsync();
     Task RemoveOrderAsync();
     /// <summary>
@@ -103,12 +103,13 @@ public interface IJABL
     /// Saves the order to a JSON file, that can be used later
     /// </summary>
     /// <param name="_order">The list that the user has on hand currently, which will be saved with</param>
-    Task SaveOrderAsync(List<JAModel.ShopItem> _order);
+    Task SaveOrderAsync(JAModel.ShopItem _item, int cartID, int userID, int productQuantity);
     /// <summary>
     /// Gets the store name that the user is shopping at
     /// </summary>
     /// <param name="userID">Gets the ID of the current user that is shopping</param>
     /// <returns></returns>
     Task<string> GetStoreNameAsync(int userID);
+    Task CreateOrderAsync(int userID);
 
 }

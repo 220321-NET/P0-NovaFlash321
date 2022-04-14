@@ -83,13 +83,13 @@ namespace ConsoleProjectUI
             HttpClient client = new HttpClient();
             try
             {
-             HttpResponseMessage response = await client.PutAsync(url, content);
-             response.EnsureSuccessStatusCode();   
+                HttpResponseMessage response = await client.PutAsync(url, content);
+                response.EnsureSuccessStatusCode();   
                 
             }
             catch (HttpRequestException e)
             {
-               Console.Write(e.Message);
+                Console.Write(e.Message);
             }
         }
 
@@ -150,13 +150,13 @@ namespace ConsoleProjectUI
         #region  Functions to Add
 
 
-        public async Task<List<ShopItem>> SearchForOrderAsync()
+        public async Task<Dictionary<int,List<ShopItem>>> SearchForOrderAsync(int userID)
         {
 
             
             //http get
         //search for order from json
-        return new List<ShopItem>();
+        return new Dictionary<int, List<ShopItem>>();
         }
 
         public async Task<string> GetStoreNameAsync(int userID)
@@ -169,16 +169,23 @@ namespace ConsoleProjectUI
 
         public async Task RemoveOrderCartAsync()
         {
-        //potentially gets an SQL table? ask Juniper
+        
         //remove order cart
+        //http delete
         }
 
         
-        public async Task SaveOrderAsync(List<ShopItem> _order)
+        public async Task SaveOrderAsync(JAModel.ShopItem _item, int cartID, int userID, int productQuantity)
         {
-            //potentially gets an SQL table? ask Juniper
+        //creates to cart instance table
+        //http post
+        //save cart to database as temp row
+        }
 
-        //save order to json
+        public async Task CreateOrderAsync()
+        {
+            //creates to cart table
+            //http post
         }
 
         public async Task ConfirmOrderAsync(List<ShopItem> _order, int _storeID, int _userID)

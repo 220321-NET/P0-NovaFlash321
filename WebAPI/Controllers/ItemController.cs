@@ -95,6 +95,16 @@ namespace WebAPI.Controllers
             await _bl.UpdateFoodItemAsync(_item);
         }
         
+        [HttpGet("GetCart/{userID}")]
+        public async Task<Dictionary<int, List<ShopItem>>>GetUserCartAsync(int userID)
+        {
+            return await _bl.SearchForOrderAsync(userID);
+        }
+        [HttpPost("CreateCart/{userID}")]
+        public async Task CreateCartAsync(int userID)
+        {
+            await _bl.CreateOrderAsync(userID);
+        }
         //[HttpGet]
         //public Dictionary<int, string> CheckOrderHistory(int _select, int _userID)
         //{
@@ -115,10 +125,15 @@ namespace WebAPI.Controllers
         }
 
         // DELETE api/<ItemController>/5
-        [HttpDelete("RemoveInventoryItem/{itemName}/{storeID}")]
-        public async Task RemoveInventoryItemAsync(ShopItem _item, int storeID)
+        [HttpDelete("RemoveInventoryItem/{_itemName}/{storeID}")]
+        public async Task RemoveInventoryItemAsync(string _itemName, int storeID)
         {
-            await _bl.RemoveItemAsync(_item, _item.StoreID);
+            ShopItem _item = new ShopItem()
+            {
+                Name = _itemName,
+                StoreID = storeID
+            };
+            await _bl.RemoveItemAsync(_item, storeID);
 
         }
     }
