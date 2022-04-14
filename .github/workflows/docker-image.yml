@@ -1,0 +1,61 @@
+name: Docker Image CD
+
+#These are the events that this workflow will be triggered for
+on:
+  push:
+    branches: [ DevOps ]
+  pull_request:
+    branches: [ DevOps ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Docker Setup Buildx
+      uses: docker/setup-buildx-action@v1.6.0
+    
+    - name: Docker Login
+      uses: docker/login-action@v1.14.1
+      with:
+        # Username used to log against the Docker registry
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        # Password or personal access token used to log against the Docker registry
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: create-json
+      uses: jsdaniell/create-json@1.1.2
+      with:
+        # The name of the file to be written. | file.json 
+        name: appsettings.json
+        # The json string that can be a secret of the github repo or a string of a json. | "{"title": "my json"}" 
+        json: ${{secrets.APPSETTINGS}}
+        # Optional subfolder directory to save the json file. | src/ 
+        dir: ./WebAPI
+
+
+
+
+
+
+    - name: Build and push Docker images
+      # You may pin to the exact commit or the version.
+      # uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
+      uses: docker/build-push-action@v2.10.0
+      with:
+        context: ./
+        file: ./Dockerfile
+        push: true
+        tags: index.docker.io/${{secrets.DOCKERHUB_USERNAME}}/stacklite:${{github.sha}}
+
+    
+    
+
+    
+    #builds the docker image
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
