@@ -61,7 +61,7 @@ jobs:
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
   deploy:
     runs-on: ubuntu-latest
-    
+    needs: build
     steps:
     - name: Azure WebApp
       uses: Azure/webapps-deploy@v2
