@@ -4,6 +4,10 @@ namespace JAConsoleBL;
 
 public class ConsoleProjBL : IJABL 
 { 
+    public async Task CreateOrderAsync(int userID)
+    {
+        await _repo.CreateOrderAsync(userID);
+    }
     public async Task ChangeStoreAsync(int _newID, JAModel.UserPass _currentUser)
     {
         await _repo.ChangeStoreAsync(_newID, _currentUser);
@@ -18,15 +22,24 @@ public class ConsoleProjBL : IJABL
             await _repo.CreateNewAdminAsync(_newAdmin);
     }
 
-    public async Task SaveOrderAsync(List<JAModel.ShopItem> _order)
+    public async Task SaveOrderAsync(OrderInstance _instance)
     {
-        await _repo.SaveOrderAsync(_order);
+        await _repo.SaveOrderAsync(_instance);
     }
     public  async Task RemoveItemAsync(JAModel.ShopItem _item, int storeID)
     {
         await _repo.RemoveItemAsync(_item, storeID);
     }
 
+    public  async Task RemoveOrderItemAsync(int _itemID, int _userID)
+    {
+        await _repo.RemoveOrderItemAsync(_itemID, _userID);
+    }
+
+    public async Task<int> GetCartID(int userID)
+    {
+        return await _repo.GetCartID(userID);
+    }
     public async Task<List<UserPass>> GetAllAdminsAsync()
     {
         
@@ -90,9 +103,9 @@ public async Task UpdateFoodItemAsync(JAModel.ShopItem _item)
 
     #region UserMenu
 
-public async Task<List<JAModel.ShopItem>> SearchForOrderAsync()
+public async Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(int userID)
 {
-    return await _repo.SearchForOrderAsync();
+    return await _repo.SearchForOrderAsync(userID);
 }
 public async Task AddOrderItemAsync()
 {

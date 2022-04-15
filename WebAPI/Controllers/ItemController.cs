@@ -95,6 +95,29 @@ namespace WebAPI.Controllers
             await _bl.UpdateFoodItemAsync(_item);
         }
         
+        [HttpGet("GetCartId/{userID}")]
+        public async Task<int> GetCartID(int userID)
+        {
+            return await _bl.GetCartID(userID);
+        }
+
+
+        [HttpGet("GetCart/{userID}")]
+        public async Task<Dictionary<int, List<ShopItem>>>GetUserCartAsync(int userID)
+        {
+            return await _bl.SearchForOrderAsync(userID);
+        }
+        [HttpPost("CreateCart/{userID}")]
+        public async Task CreateCartAsync(int userID)
+        {
+            await _bl.CreateOrderAsync(userID);
+        }
+
+        [HttpPost("UpdateCart/{cartID}/{userID}")]
+        public async Task UpdateCart(OrderInstance _instance)
+        {
+            await _bl.SaveOrderAsync(_instance);
+        }
         //[HttpGet]
         //public Dictionary<int, string> CheckOrderHistory(int _select, int _userID)
         //{
@@ -115,11 +138,22 @@ namespace WebAPI.Controllers
         }
 
         // DELETE api/<ItemController>/5
-        [HttpDelete("RemoveInventoryItem/{itemName}/{storeID}")]
-        public async Task RemoveInventoryItemAsync(ShopItem _item, int storeID)
+        [HttpDelete("RemoveInventoryItem/{_itemName}/{storeID}")]
+        public async Task RemoveInventoryItemAsync(string _itemName, int storeID)
         {
-            await _bl.RemoveItemAsync(_item, _item.StoreID);
+            ShopItem _item = new ShopItem()
+            {
+                Name = _itemName,
+                StoreID = storeID
+            };
+            await _bl.RemoveItemAsync(_item, storeID);
 
+        }
+
+        [HttpDelete("RemoveOrderItem/{_itemID}/{_userID}")]
+        public async Task RemoveOrderItemAsync(int _itemID, int _userID)
+        {
+            await _bl.RemoveOrderItemAsync(_itemID, _userID);
         }
     }
 
