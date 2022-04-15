@@ -401,6 +401,27 @@ connection.Close();
 return item;
 }
 
+public async Task RemoveOrderItemAsync(int _itemID, int _userID)
+{
+    SqlConnection connection = new SqlConnection(_connectionString);
+    connection.Open();
+    SqlCommand cmd = new SqlCommand();
+    cmd = new SqlCommand("DELETE FROM CartInstance WHERE productID = @productid AND userID = @userid", connection);
+    cmd.Parameters.AddWithValue("@productid", _itemID);
+    cmd.Parameters.AddWithValue("@userid",_userID);
+
+    try
+    {
+        cmd.ExecuteNonQuery();
+    }
+    catch(Exception e)
+    {
+        Console.WriteLine(e.Message);
+    }
+
+    connection.Close();
+}
+
 
 public async Task RemoveItemAsync(JAModel.ShopItem _item, int storeID)
 {
@@ -466,19 +487,19 @@ connection.Close();
 }
 
 
-public async Task SaveOrderAsync(JAModel.ShopItem _item, int cartID, int userID, int productQuantity)
+public async Task SaveOrderAsync(JAModel.OrderInstance _instance)
 {
 // string jsonContents = JsonSerializer.Serialize(_order);
 // File.WriteAllText(orderFilePath, jsonContents);
     SqlConnection connection = new SqlConnection(_connectionString);
     connection.Open();
     SqlCommand cmd = new SqlCommand();
-    cmd = new SqlCommand("INSERT INTO CartInstance(cartID, userID, productID, storeID, productQuantity) VALUES(@cartid, @userid, @productid, @storeid, @productquantity)", connection);
-    cmd.Parameters.AddWithValue("@cartid", cartID);
-    cmd.Parameters.AddWithValue("@userid", userID);
-    cmd.Parameters.AddWithValue("@productid", _item.Id);
-    cmd.Parameters.AddWithValue("@storeid", _item.StoreID);
-    cmd.Parameters.AddWithValue("@productquantity", productQuantity);
+    cmd = new SqlCommand("INSERT INTO CartInstance(cartID, userID, productID, orderQuantity) VALUES(@cartid, @userid, @productid, @productquantity)", connection);
+    cmd.Parameters.AddWithValue("@cartid", _instance.CartID);
+    cmd.Parameters.AddWithValue("@userid", _instance.UserID);
+    cmd.Parameters.AddWithValue("@productid", _instance.ItemId);
+    cmd.Parameters.AddWithValue("@productquantity", _instance.ProductQuantity);
+
     try
     {
         cmd.ExecuteNonQuery();
@@ -499,23 +520,24 @@ public async Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(i
     SqlConnection connection = new SqlConnection(_connectionString);
     connection.Open();
     SqlCommand cmd = new SqlCommand();
-    cmd = new SqlCommand("SELECT * FROM CartInstance WHERE userID = @userid",connection);
+    cmd = new SqlCommand("SELECT CartInstance.cartID, CartInstance.userID, CartInstance.productID, CartInstance.orderQuantity, ShopItem.productName, ShopItem.productPrice FROM CartInstance JOIN ShopItem ON CartInstance.productID = ShopItem.productID WHERE userID = @userid",connection);
     cmd.Parameters.AddWithValue("@userid", userID);
     SqlDataReader reader = cmd.ExecuteReader();
     while(reader.Read())
     {
         _cartid = reader.GetInt32(0);
         int productID = reader.GetInt32(2);
-        int storeID = reader.GetInt32(3);
-        int quantity = reader.GetInt32(4);
-        string productName = reader.GetString(5);
+        int quantity = reader.GetInt32(3);
+        string name = reader.GetString(4);
+        decimal price = reader.GetDecimal(5);
 
         _item = new JAModel.ShopItem
         {
             Id = productID,
-            StoreID = storeID,
+            Name = name,
             Quantity = quantity,
-            Name = productName,
+            Price = (float)price,
+
         };
         _orderContents.Add(_item);
     }
@@ -523,6 +545,24 @@ public async Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(i
     order.Add(_cartid, _orderContents);
     connection.Close();
     return order;
+}
+
+public async Task<int> GetCartID(int userID)
+{   
+    int cartID = 0;
+
+    SqlConnection connection = new SqlConnection(_connectionString);
+    connection.Open();
+    SqlCommand cmd = new SqlCommand();
+    cmd = new SqlCommand("SELECT cartID FROM Carts WHERE userID = @userid", connection);
+    cmd.Parameters.AddWithValue("@userid", userID);
+    SqlDataReader reader = cmd.ExecuteReader();
+    while(reader.Read())
+    {
+        cartID = reader.GetInt32(0);
+    }
+    connection.Close();
+    return cartID;
 }
     public async Task AddOrderItemAsync()
     {   

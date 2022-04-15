@@ -151,12 +151,23 @@ namespace ConsoleProjectUI
 
 
         public async Task<Dictionary<int,List<ShopItem>>> SearchForOrderAsync(int userID)
-        {
-
+        {   
+            Dictionary<int, List<ShopItem>> _order = new Dictionary<int, List<ShopItem>>();
+            string url = _apiBaseURL + $"GetCart/{userID}";
+            HttpClient client = new HttpClient();
+            try
+            {
+                string responseString = await client.GetStringAsync(url);
+                _order = JsonSerializer.Deserialize<Dictionary<int, List<ShopItem>>>(responseString) ?? new Dictionary<int, List<ShopItem>>();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
             
             //http get
         //search for order from json
-        return new Dictionary<int, List<ShopItem>>();
+        return _order;
         }
 
         public async Task<string> GetStoreNameAsync(int userID)
@@ -174,18 +185,81 @@ namespace ConsoleProjectUI
         //http delete
         }
 
-        
-        public async Task SaveOrderAsync(JAModel.ShopItem _item, int cartID, int userID, int productQuantity)
+        public async Task RemoveOrderItemAsync(int _itemID, int _userID)
         {
+            string url = _apiBaseURL + $"RemoveOrderItem/{_itemID}/{_userID}";
+            HttpClient client = new HttpClient();
+
+            try
+            {
+                HttpResponseMessage responseMessage = await client.DeleteAsync(url);
+                responseMessage.EnsureSuccessStatusCode();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            //remove item from order cart
+            //http delete
+        }
+
+        
+        public async Task SaveOrderAsync(OrderInstance _instance)
+        {
+            string url = _apiBaseURL + $"UpdateCart/{_instance.CartID}/{_instance.UserID}";
+
+            string serializedItem = JsonSerializer.Serialize(_instance);
+            StringContent sContent = new StringContent(serializedItem, Encoding.UTF8, "application/json"); 
+            HttpClient client = new HttpClient();
+
+            try
+            {
+                HttpResponseMessage response = await client.PostAsync(url, sContent);
+                response.EnsureSuccessStatusCode();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
         //creates to cart instance table
         //http post
         //save cart to database as temp row
         }
 
-        public async Task CreateOrderAsync()
+        public async Task<int> GetCartId(int userID)
         {
-            //creates to cart table
-            //http post
+            int cartID = 0;
+            string url = _apiBaseURL + $"GetCartId/{userID}";
+            HttpClient client = new HttpClient();
+            try
+            {
+                cartID = int.Parse(await client.GetStringAsync(url));
+            }
+            catch(HttpRequestException e){
+                Console.WriteLine(e.Message);
+            }
+
+
+
+            return cartID;
+        }
+
+        public async Task CreateOrderAsync(int userID)
+        {
+            string url = _apiBaseURL + $"CreateCart/{userID}";
+            string serializedItem = JsonSerializer.Serialize(userID);
+            StringContent content = new StringContent(serializedItem, Encoding.UTF8, "application/json");
+            HttpClient client =  new HttpClient();
+            try
+            {
+                HttpResponseMessage response = await client.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
         }
 
         public async Task ConfirmOrderAsync(List<ShopItem> _order, int _storeID, int _userID)

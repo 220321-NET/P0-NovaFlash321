@@ -95,6 +95,13 @@ namespace WebAPI.Controllers
             await _bl.UpdateFoodItemAsync(_item);
         }
         
+        [HttpGet("GetCartId/{userID}")]
+        public async Task<int> GetCartID(int userID)
+        {
+            return await _bl.GetCartID(userID);
+        }
+
+
         [HttpGet("GetCart/{userID}")]
         public async Task<Dictionary<int, List<ShopItem>>>GetUserCartAsync(int userID)
         {
@@ -104,6 +111,12 @@ namespace WebAPI.Controllers
         public async Task CreateCartAsync(int userID)
         {
             await _bl.CreateOrderAsync(userID);
+        }
+
+        [HttpPost("UpdateCart/{cartID}/{userID}")]
+        public async Task UpdateCart(OrderInstance _instance)
+        {
+            await _bl.SaveOrderAsync(_instance);
         }
         //[HttpGet]
         //public Dictionary<int, string> CheckOrderHistory(int _select, int _userID)
@@ -135,6 +148,12 @@ namespace WebAPI.Controllers
             };
             await _bl.RemoveItemAsync(_item, storeID);
 
+        }
+
+        [HttpDelete("RemoveOrderItem/{_itemID}/{_userID}")]
+        public async Task RemoveOrderItemAsync(int _itemID, int _userID)
+        {
+            await _bl.RemoveOrderItemAsync(_itemID, _userID);
         }
     }
 

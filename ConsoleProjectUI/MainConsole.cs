@@ -971,15 +971,37 @@ private async Task<Dictionary<int, List<ShopItem>>> SearchForOrderAsync(int user
     private async Task PlaceNewOrderAsync()
     {
         Dictionary<int, List<ShopItem>> orderCart = await SearchForOrderAsync(currentUser.UserID);
-        List<ShopItem> orderContents = orderCart[1];
+        Console.WriteLine(orderCart);
+        List<ShopItem> orderContents = new List<ShopItem>();
+        
+        int key = 0;
+        if(orderCart.Count > 0)
+        {
+            foreach(KeyValuePair<int, List<ShopItem>> _order in orderCart)
+            {
+                key = _order.Key;
+            }
+            orderContents = orderCart[key];
+        }
         //List<ShopItem> orderContents = await SearchForOrderAsync();
         
-        if(orderContents.Count == 0 || orderContents == null)
+        if(key == 0 || orderContents == null)
         {
-            Console.WriteLine("No order was found! Creating a new order");
+            Console.WriteLine("No order was found! Checking if key exists");
+            int cartID = await httpService.GetCartId(currentUser.UserID);
+            if(cartID == 0)
+            {
+                Console.WriteLine("No tag found! Creating a new order tag");
+                await httpService.CreateOrderAsync(currentUser.UserID);
+            }
+            else
+            {
+                Console.WriteLine("Tag found. Using existing tag");
+            }
+
+            orderContents = new List<ShopItem>();
+            await AddOrderItemAsync(orderContents, cartID);
             
-            //orderCart = new Dictionary<int, List<ShopItem>>();
-            //await AddOrderItemAsync(orderContents);
         }
         else
         {   
@@ -997,21 +1019,21 @@ private async Task<Dictionary<int, List<ShopItem>>> SearchForOrderAsync(int user
             switch(input)
             {
                 case 'Y': 
-                await AddOrderItemAsync(orderContents);
+                await AddOrderItemAsync(orderContents, key);
                 break;
                 case 'N': 
                 Console.WriteLine("Creating new order");
 
-                //orderContents = new Dictionary<int, List<ShopItem>>();
-
+                await httpService.CreateOrderAsync(currentUser.UserID);
+                int cartID = await httpService.GetCartId(currentUser.UserID);
                 orderContents = new List<ShopItem>();
-                await AddOrderItemAsync(orderContents);
+                await AddOrderItemAsync(orderContents, cartID);
                 break;
                 default: Console.WriteLine("Invalid Response!"); goto PNOYesNo;
             };
         }
     }   
-private async Task AddOrderItemAsync(List<ShopItem> _order)
+private async Task AddOrderItemAsync(List<ShopItem> _order, int cartID)
 {
     ShopItem _tempItem = new ShopItem();
         string _storeName = await httpService.GetStoreNameAsync(currentUser.UserID);
@@ -1033,9 +1055,7 @@ private async Task AddOrderItemAsync(List<ShopItem> _order)
         upper = char.ToUpper(upper);
         foodItem = foodItem.Replace(foodItem[0], upper);
 
-        ShopItem searchedItem = new ShopItem(); 
-        
-        await httpService.SearchInventoryAsync(foodItem, currentUser.StoreID);
+        ShopItem searchedItem = await httpService.SearchInventoryAsync(foodItem, currentUser.StoreID);
         if(searchedItem.Id == 0)
         {
             Console.WriteLine("Item does not exist!");
@@ -1069,6 +1089,14 @@ private async Task AddOrderItemAsync(List<ShopItem> _order)
                     TypeOfFood = searchedItem.TypeOfFood,
                 };
                 _order.Add(_tempItem);
+                OrderInstance _instance = new OrderInstance
+                {
+                    ProductQuantity = _tempItem.Quantity,
+                    UserID = currentUser.UserID,
+                    ItemId = _tempItem.Id,
+                    CartID = cartID
+                };
+                await httpService.SaveOrderAsync(_instance);
 
             }
             PNOFinal:
@@ -1089,7 +1117,6 @@ private async Task AddOrderItemAsync(List<ShopItem> _order)
                         break;
                 }
         }
-        await httpService.SaveOrderAsync(_tempItem, 0, currentUser.UserID, _tempItem.Quantity);
         //_bl.SaveOrder(_order);
         }while(isOrdering);
 }
@@ -1097,7 +1124,19 @@ private async Task AddOrderItemAsync(List<ShopItem> _order)
 private async Task RemoveOrderItem()
 {
     Dictionary<int, List<ShopItem>> _orderCart = await SearchForOrderAsync(currentUser.UserID);
-    List<ShopItem> _order = _orderCart[0];
+    List<ShopItem> _order = new List<ShopItem>();
+    if(_orderCart.ContainsKey(0))
+    {
+        Console.WriteLine("Your cart is currently empty!");
+        return;
+    }
+    else
+    {
+    int key = await httpService.GetCartId(currentUser.UserID);
+    _order = _orderCart[key];
+    }
+    
+
     if(_order.Count > 0)
     {
         Console.WriteLine("Your current order:");
@@ -1123,7 +1162,9 @@ private async Task RemoveOrderItem()
         int indexInput = input - '0';
         if((indexInput - 1) < _order.Count)
         {
-            //_order.RemoveAt(indexInput - 1);
+            await httpService.RemoveOrderItemAsync(_order[indexInput - 1].Id, currentUser.UserID);
+            Console.WriteLine($"{_order[indexInput - 1].Name} has been removed from your order!");
+            _order.RemoveAt(indexInput - 1);
             //_bl.SaveOrder(_order);
         }
         else
@@ -1139,8 +1180,10 @@ private async Task RemoveOrderItem()
 }
 private async Task ConfirmOrderAsync()
 {
-    List<ShopItem> _order = new List<ShopItem>(); 
-    //_bl.SearchForOrderAsync();
+    Dictionary<int, List<ShopItem>> _orderContents = await SearchForOrderAsync(currentUser.UserID);
+    int key = await httpService.GetCartId(currentUser.UserID);
+    List<ShopItem> _order = _orderContents[key];
+    float totalPrice = 0;
     if(_order.Count > 0)
     {
 
@@ -1150,7 +1193,10 @@ private async Task ConfirmOrderAsync()
     {
         Console.WriteLine($"Item #{index}: {_item.Quantity} {_item.Name}, $" + (_item.Price * _item.Quantity).ToString("###.00"));
         index++;
+        totalPrice += (_item.Price * _item.Quantity);
     }
+
+    Console.WriteLine( "Your total price is $" +totalPrice.ToString("######.00") );
     COValidation:
     Console.WriteLine("Do you wish to place this order? [Y/N]");
     string? uInput = Console.ReadLine();

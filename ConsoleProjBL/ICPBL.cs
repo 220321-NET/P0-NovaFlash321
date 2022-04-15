@@ -103,7 +103,7 @@ public interface IJABL
     /// Saves the order to a JSON file, that can be used later
     /// </summary>
     /// <param name="_order">The list that the user has on hand currently, which will be saved with</param>
-    Task SaveOrderAsync(JAModel.ShopItem _item, int cartID, int userID, int productQuantity);
+    Task SaveOrderAsync(JAModel.OrderInstance _instance);
     /// <summary>
     /// Gets the store name that the user is shopping at
     /// </summary>
@@ -111,5 +111,7 @@ public interface IJABL
     /// <returns></returns>
     Task<string> GetStoreNameAsync(int userID);
     Task CreateOrderAsync(int userID);
+    Task<int> GetCartID(int userID);
+    Task RemoveOrderItemAsync(int _itemID, int _userID);
 
 }

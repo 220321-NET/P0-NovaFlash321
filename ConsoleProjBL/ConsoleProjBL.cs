@@ -22,15 +22,24 @@ public class ConsoleProjBL : IJABL
             await _repo.CreateNewAdminAsync(_newAdmin);
     }
 
-    public async Task SaveOrderAsync(JAModel.ShopItem _item, int cartID, int userID, int productQuantity)
+    public async Task SaveOrderAsync(OrderInstance _instance)
     {
-        await _repo.SaveOrderAsync(_item, cartID, userID, productQuantity);
+        await _repo.SaveOrderAsync(_instance);
     }
     public  async Task RemoveItemAsync(JAModel.ShopItem _item, int storeID)
     {
         await _repo.RemoveItemAsync(_item, storeID);
     }
 
+    public  async Task RemoveOrderItemAsync(int _itemID, int _userID)
+    {
+        await _repo.RemoveOrderItemAsync(_itemID, _userID);
+    }
+
+    public async Task<int> GetCartID(int userID)
+    {
+        return await _repo.GetCartID(userID);
+    }
     public async Task<List<UserPass>> GetAllAdminsAsync()
     {
         
