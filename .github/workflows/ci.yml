@@ -29,8 +29,8 @@ jobs:
         
       - name : Build
         run: |
-          pwd
-          dotnet clean build ./WebAPI -c Release
+          cd ./
+          dotnet clean build -c Release
       
       
       - name: Set up JDK 11
