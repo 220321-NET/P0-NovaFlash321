@@ -1214,7 +1214,7 @@ private async Task ConfirmOrderAsync()
                 switch(input)
                 {
                     case 'Y':
-                    await httpService.ConfirmOrderAsync(_order, currentUser.StoreID, currentUser.UserID);
+                    await httpService.ConfirmOrderAsync(_order, currentUser.UserID, key);
                     //_bl.ConfirmOrder(_order, currentUser.StoreID, currentUser.UserID);
                     break;
                     case 'N':

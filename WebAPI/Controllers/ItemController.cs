@@ -128,13 +128,12 @@ namespace WebAPI.Controllers
         // GET api/<ItemController>/5
         // POST api/<ItemController>
 
-        
-
-
-        // PUT api/<ItemController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPost("ConfirmOrder/{cartID}/{userID}")]
+        public async Task ConfirmOrderAsync(Dictionary<int, List<ShopItem>> CartContents)
         {
+            
+            await _bl.ConfirmOrderAsync(CartContents);
+
         }
 
         // DELETE api/<ItemController>/5

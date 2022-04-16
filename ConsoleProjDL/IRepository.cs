@@ -21,7 +21,7 @@ public interface IRepo
     Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(int userID);
     Task AddOrderItemAsync();
     Task RemoveOrderAsync();
-    Task ConfirmOrderAsync(List<JAModel.ShopItem> _order, int storeID, int userID);
+    Task ConfirmOrderAsync(Dictionary<int, List<JAModel.ShopItem>> Order);
     /// <summary>
 /// Checks the order history of the user that is logged in
 /// </summary>

@@ -520,7 +520,7 @@ public async Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(i
     SqlConnection connection = new SqlConnection(_connectionString);
     connection.Open();
     SqlCommand cmd = new SqlCommand();
-    cmd = new SqlCommand("SELECT CartInstance.cartID, CartInstance.userID, CartInstance.productID, CartInstance.orderQuantity, ShopItem.productName, ShopItem.productPrice FROM CartInstance JOIN ShopItem ON CartInstance.productID = ShopItem.productID WHERE userID = @userid",connection);
+    cmd = new SqlCommand("SELECT CartInstance.cartID, CartInstance.userID, CartInstance.productID, CartInstance.orderQuantity, ShopItem.productName, ShopItem.productPrice, ShopItem.storeID FROM CartInstance JOIN ShopItem ON CartInstance.productID = ShopItem.productID WHERE userID = @userid",connection);
     cmd.Parameters.AddWithValue("@userid", userID);
     SqlDataReader reader = cmd.ExecuteReader();
     while(reader.Read())
@@ -530,6 +530,7 @@ public async Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(i
         int quantity = reader.GetInt32(3);
         string name = reader.GetString(4);
         decimal price = reader.GetDecimal(5);
+        int storeID = reader.GetInt32(6);
 
         _item = new JAModel.ShopItem
         {
@@ -537,6 +538,7 @@ public async Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(i
             Name = name,
             Quantity = quantity,
             Price = (float)price,
+            StoreID = storeID
 
         };
         _orderContents.Add(_item);
@@ -589,14 +591,20 @@ public async Task RemoveOrderAsync()
 string jsonContents = "[]";
 File.WriteAllText(orderFilePath, jsonContents);
 }
-public async Task ConfirmOrderAsync(List<JAModel.ShopItem> _order, int storeID, int userID)
+public async Task ConfirmOrderAsync(Dictionary<int, List<JAModel.ShopItem>> Order)
 {
-List<JAModel.ShopItem> _curInventory = new List<JAModel.ShopItem>();
+    int userID = 0;
+    List<JAModel.ShopItem> _curInventory = new List<JAModel.ShopItem>();
+    foreach(KeyValuePair<int, List<JAModel.ShopItem>> Contents in Order)
+    {
+        userID = Contents.Key;
+    }
+    List<JAModel.ShopItem> _order = Order[userID];
 SqlConnection connection = new SqlConnection(_connectionString);
 
 connection.Open();
 SqlCommand neworder = new SqlCommand("INSERT INTO OrderHistory (userID, orderDate) VALUES (@userid, GETDATE())", connection);
-neworder.Parameters.AddWithValue("userid", userID);
+neworder.Parameters.AddWithValue("@userid", userID);
 
 try
 {
@@ -604,7 +612,8 @@ try
 }
 catch(Exception e)
 {
-    Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
+    Console.WriteLine(e.Message);
+    //Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
 }
 connection.Close();
 connection.Open();
@@ -624,28 +633,29 @@ float totalPrice = 0f;
 foreach(JAModel.ShopItem _item in _order)
 {
     connection.Open();
-    SqlCommand cmd = new SqlCommand("SELECT * FROM ShopItem WHERE productName = @name AND storeID = @storeid", connection);
-    cmd.Parameters.AddWithValue("@name", _item.Name);
-    cmd.Parameters.AddWithValue("@storeid", storeID);
+    SqlCommand cmd = new SqlCommand("SELECT * FROM ShopItem WHERE productID = @productid", connection);
+    cmd.Parameters.AddWithValue("@productid", _item.Id);
+
     SqlDataReader reader = cmd.ExecuteReader();
     int quantity = 0;
     while(reader.Read())
     {
-        quantity = (reader.GetInt32(3)) - _item.Quantity;
+        quantity = ((reader.GetInt32(3)) - _item.Quantity);
     }
     connection.Close();
     connection.Open();
-    cmd = new SqlCommand("UPDATE ShopItem SET productQuantity = @quantity WHERE productName = @name AND storeID = @storeid",connection);
+    cmd = new SqlCommand("UPDATE ShopItem SET productQuantity = @quantity WHERE productID = @productid",connection);
     cmd.Parameters.AddWithValue("@quantity", quantity);
-    cmd.Parameters.AddWithValue("@name", _item.Name);
-    cmd.Parameters.AddWithValue("@storeid", storeID);
+    cmd.Parameters.AddWithValue("@productid", _item.Id);
+
     try
     {
         cmd.ExecuteNonQuery();
     }
     catch(Exception e)
     {
-        Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
+        Console.WriteLine(e.Message);
+        //Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
     }
     connection.Close();
     totalPrice += (_item.Price * _item.Quantity);
@@ -657,8 +667,8 @@ foreach(JAModel.ShopItem _item in _order)
     connection.Open();
     SqlCommand ordercmd = new SqlCommand("INSERT INTO OrderInstance(orderID, storeID, totalPrice, userID, productID, orderQuantity)  VALUES(@orderid, @storeid, @totalprice, @userid, @productid, @quantity)", connection);
     ordercmd.Parameters.AddWithValue("@orderid", orderID);
-    ordercmd.Parameters.AddWithValue("@storeid", storeID);
-    ordercmd.Parameters.AddWithValue("@totalprice", float.Parse((_item.Price * _item.Quantity).ToString("###.00")));
+    ordercmd.Parameters.AddWithValue("@storeid", _item.StoreID);
+    ordercmd.Parameters.AddWithValue("@totalprice", float.Parse((_item.Price * _item.Quantity).ToString("######.00")));
     ordercmd.Parameters.AddWithValue("@userid", userID);
     ordercmd.Parameters.AddWithValue("@productid", _item.Id);
     ordercmd.Parameters.AddWithValue("@quantity", _item.Quantity);
@@ -669,7 +679,8 @@ foreach(JAModel.ShopItem _item in _order)
     }
     catch(Exception e)
     {
-            Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
+        Console.WriteLine(e.Message);
+            //Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
     }
     connection.Close();
 }   

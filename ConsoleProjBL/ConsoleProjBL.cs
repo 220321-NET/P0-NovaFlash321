@@ -116,9 +116,9 @@ public async Task RemoveOrderAsync()
 {
     await _repo.RemoveOrderAsync();
 }
-public async Task ConfirmOrderAsync(List<JAModel.ShopItem> _order, int storeID, int userID)
+public async Task ConfirmOrderAsync(Dictionary<int, List<JAModel.ShopItem>> Order)
 {
-    await _repo.ConfirmOrderAsync(_order, storeID, userID);
+    await _repo.ConfirmOrderAsync(Order);
 }
 public async Task<string> GetStoreNameAsync(int userID)
 {

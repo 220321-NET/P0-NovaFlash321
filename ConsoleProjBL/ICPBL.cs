@@ -91,7 +91,7 @@ public interface IJABL
     /// <param name="_order">The list of items in the user's order</param>
     /// <param name="storeID">The store ID that the user is shopping at, that the inventory is taken from</param>
     /// <param name="userID">Gets current ID from the user that is logged in</param>
-    Task ConfirmOrderAsync(List<JAModel.ShopItem> _order, int storeID, int userID);
+    Task ConfirmOrderAsync(Dictionary<int, List<JAModel.ShopItem>> Order);
         /// <summary>
 /// Checks the order history of the user that is logged in
 /// </summary>

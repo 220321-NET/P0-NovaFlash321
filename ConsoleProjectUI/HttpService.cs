@@ -262,10 +262,26 @@ namespace ConsoleProjectUI
 
         }
 
-        public async Task ConfirmOrderAsync(List<ShopItem> _order, int _storeID, int _userID)
+        public async Task ConfirmOrderAsync(List<ShopItem> _order, int _userID, int cartID)
         {
-            //http put
-        //confirm order
+            string url = _apiBaseURL + $"ConfirmOrder/{cartID}/{_userID}";
+            Dictionary<int, List<ShopItem>> Cart = new Dictionary<int, List<ShopItem>>();
+            Cart.Add(_userID, _order);
+            
+            string serializedItem = JsonSerializer.Serialize(Cart);
+            StringContent content = new StringContent(serializedItem, Encoding.UTF8, "application/json");
+            HttpClient client = new HttpClient();
+            try
+            {
+                HttpResponseMessage response = await client.PostAsync(url,content);
+                response.EnsureSuccessStatusCode();
+
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
         } 
 
         public async Task<Dictionary<int,string>> CheckOrderHistoryAsync(int _select, int _userID)
