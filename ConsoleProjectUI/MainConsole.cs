@@ -529,8 +529,26 @@ namespace JAConsole;
         {
             quantity = int.Parse(foodQuantity);
         }
+        if(_item.Price <= 0)
+        {
+            UIPrice:
+            Console.WriteLine("Enter the price");
+            string? foodPrice = Console.ReadLine();
+            if(string.IsNullOrWhiteSpace(foodPrice) || foodPrice == "0")
+            {
+                Console.WriteLine("Invalid price!");
+                goto UIPrice;
+            }
+            else
+            {
+                _item.Price = float.Parse(foodPrice);
+            }
+        }
+
+
+
         UIConfirm:
-        Console.WriteLine("Confirm you want to add " + quantity + " to " + _item.Name + ". [Y/N]");
+        Console.WriteLine("Confirm you want to add " + quantity + " to " + _item.Name + $", and change the price to ${_item.Price.ToString("######.00")}. [Y/N]");
         string? uInput = Console.ReadLine();
 
         if(string.IsNullOrWhiteSpace(uInput))
@@ -548,6 +566,7 @@ namespace JAConsole;
                 {
                     case 'Y': 
                         await httpService.UpdateItemQuantityAsync(_item, quantity);
+                        Console.WriteLine("Item added to inventory!");
                         //_bl.UpdateFoodItem(_item, quantity);
                         break;
                     case 'N':
@@ -826,7 +845,7 @@ namespace JAConsole;
                 {
                     case 'Y': 
                         await httpService.RemoveItem(searchedItem, currentUser.StoreID);
-                        //_bl.RemoveItem(searchedItem, currentUser.StoreID);
+                        Console.WriteLine("Item removed from inventory!");
                         break;
                     case 'N': 
                         return;
@@ -902,8 +921,8 @@ namespace JAConsole;
                 {
                     
                     float _newPrice = float.Parse(rInput);
-                    await httpService.ChangePriceAsync(searchedItem.Name, _newPrice, currentUser.StoreID);
-                    //_bl.ChangePrice(searchedItem, _newPrice, currentUser.StoreID);
+                    await httpService.ChangePriceAsync(searchedItem, _newPrice);
+
 
                 }
                 
@@ -1259,8 +1278,7 @@ private async Task CheckOrderHistoryAsync()
     
     if(select >= 1 && select <= 4)
     {
-        Dictionary<int, string> orderHistory = new Dictionary<int, string>(); 
-        await httpService.CheckOrderHistoryAsync(select, currentUser.UserID);
+        Dictionary<int, string> orderHistory = await httpService.CheckOrderHistoryAsync(select, currentUser.UserID);
         //_bl.CheckOrderHistory(select, currentUser.UserID);
         foreach(KeyValuePair<int,string> _order in orderHistory)
         {

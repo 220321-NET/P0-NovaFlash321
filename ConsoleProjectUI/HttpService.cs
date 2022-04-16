@@ -72,13 +72,12 @@ namespace ConsoleProjectUI
             return _users;
         }
 
-        public async Task ChangePriceAsync(string searchedItem, float newPrice, int storeID)
+        public async Task ChangePriceAsync(ShopItem searchedItem, float newPrice)
         {
-            ShopItem searchedShopItem = await SearchInventoryAsync(searchedItem, storeID);
-            searchedShopItem.Price = newPrice;
-            searchedShopItem.StoreID = storeID;
-            string url = _apiBaseURL + searchedItem  +"Price";
-            string serializedItem = JsonSerializer.Serialize(searchedShopItem);
+            searchedItem.Price = newPrice;
+
+            string url = _apiBaseURL + $"ChangeItemPrice/{searchedItem.Id}";
+            string serializedItem = JsonSerializer.Serialize(searchedItem);
             StringContent content = new StringContent(serializedItem, Encoding.UTF8, "application/json");
             HttpClient client = new HttpClient();
             try
@@ -286,9 +285,22 @@ namespace ConsoleProjectUI
 
         public async Task<Dictionary<int,string>> CheckOrderHistoryAsync(int _select, int _userID)
         {
-            //http get
-        //check order history
-            return new Dictionary<int, string>();
+            string url = _apiBaseURL + $"GetUserHistory/{_select}/{_userID}";
+
+            Dictionary<int,string> _history = new Dictionary<int, string>();
+            HttpClient client = new HttpClient();
+            try
+            {
+                string responseString = await client.GetStringAsync(url);
+                _history = JsonSerializer.Deserialize<Dictionary<int, string>>(responseString) ?? new Dictionary<int, string>();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+
+            return _history;
         }
 
         public async Task ChangeStoreAsync(int _storeID, UserPass _currentUser)
@@ -366,8 +378,7 @@ namespace ConsoleProjectUI
             {
                 Console.WriteLine(e.Message);
             }
-            //http put
-        //update item quantity
+
         }
         #endregion
 
@@ -382,7 +393,7 @@ namespace ConsoleProjectUI
 
             try
             {
-                HttpResponseMessage response = await client.DeleteAsync(url);
+                HttpResponseMessage response = await client.PutAsync(url, content);
                 response.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException e)

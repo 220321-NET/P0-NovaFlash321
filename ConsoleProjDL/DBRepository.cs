@@ -192,26 +192,15 @@ public async Task SaveAdminsAsync()
 #region FUNCTIONAL 
 public async Task UpdateFoodItemAsync(JAModel.ShopItem _item)
 {
-//Closed connection
-// int quantity = 0;
+
 SqlConnection connection = new SqlConnection(_connectionString);
 connection.Open();
 SqlCommand cmd = new SqlCommand();
-
-// cmd = new SqlCommand("SELECT * FROM ShopItem WHERE productName = @name", connection);
-// cmd.Parameters.AddWithValue("@name",_item.Name);
-// SqlDataReader reader = cmd.ExecuteReader();
-// while(reader.Read())
-// {
-//     quantity = _additionalQuantity + reader.GetInt32(3);
-    
-// }
-// connection.Close();
-// connection.Open();
-cmd = new SqlCommand("UPDATE ShopItem SET productQuantity = @quantity WHERE productName = @name", connection);
+cmd = new SqlCommand("UPDATE ShopItem SET productQuantity = @quantity, productPrice = @price WHERE productID = @productid", connection);
 
 cmd.Parameters.AddWithValue("@quantity", _item.Quantity);
-cmd.Parameters.AddWithValue("@name", _item.Name);
+cmd.Parameters.AddWithValue("@price", _item.Price);
+cmd.Parameters.AddWithValue("@productid", _item.Id);
 
 try
 {
@@ -428,7 +417,7 @@ public async Task RemoveItemAsync(JAModel.ShopItem _item, int storeID)
 SqlConnection connection = new SqlConnection(_connectionString);
 connection.Open();
 SqlCommand cmd = new SqlCommand();
-cmd = new SqlCommand("DELETE FROM ShopItem WHERE productName = @name AND storeID = @storeid",connection);
+cmd = new SqlCommand("UPDATE ShopItem SET productQuantity = 0, productPrice = 0 WHERE productName = @name AND storeID = @storeid",connection);
 cmd.Parameters.AddWithValue("@name", _item.Name);
 cmd.Parameters.AddWithValue("@storeid", storeID);
 
@@ -719,23 +708,40 @@ connection.Open();
 SqlCommand cmd = new SqlCommand();
 switch(_select)
 
+// 1. date old to new
+// 2. date new to old
+// 3. price low to high
+// 4. price high to low
 {
     case 1: 
-        cmd = new SqlCommand("SELECT StoreFront.storeName, OrderHistory.orderID, OrderHistory.orderDate, OrderHistory.orderCost, OrderHistory.userID, OrderInstance.productID, OrderInstance.totalPrice, OrderInstance.orderQuantity, ShopItem.productID, ShopItem.productName FROM OrderHistory JOIN OrderInstance ON OrderHistory.orderID = OrderInstance.orderID JOIN ShopItem ON ShopItem.productID = OrderInstance.productID JOIN StoreFront ON ShopItem.storeID = StoreFront.storeID WHERE OrderHistory.userID = @userid ORDER BY orderDate ASC",connection);
+        cmd = new SqlCommand("SELECT OrderInstance.orderID,  OrderInstance.productID, ShopItem.productName , OrderInstance.totalPrice,  OrderInstance.orderQuantity, OrderHistory.orderDate, OrderHistory.orderCost, StoreFront.storeName FROM OrderInstance LEFT JOIN OrderHistory ON OrderInstance.orderID = OrderHistory.orderID FULL OUTER JOIN ShopItem ON OrderInstance.productID = ShopItem.productID JOIN StoreFront ON OrderInstance.storeID = StoreFront.storeID WHERE OrderInstance.userID = @userid ORDER BY OrderHistory.orderDate ASC;",connection);
         break;
     case 2: 
-        cmd = new SqlCommand("SELECT StoreFront.storeName, OrderHistory.orderID, OrderHistory.orderDate, OrderHistory.orderCost, OrderHistory.userID, OrderInstance.productID, OrderInstance.totalPrice, OrderInstance.orderQuantity, ShopItem.productID, ShopItem.productName FROM OrderHistory JOIN OrderInstance ON OrderHistory.orderID = OrderInstance.orderID JOIN ShopItem ON ShopItem.productID = OrderInstance.productID JOIN StoreFront ON ShopItem.storeID = StoreFront.storeID WHERE OrderHistory.userID = @userid ORDER BY orderDate DESC",connection);
+        cmd = new SqlCommand("SELECT OrderInstance.orderID,  OrderInstance.productID, ShopItem.productName , OrderInstance.totalPrice,  OrderInstance.orderQuantity, OrderHistory.orderDate, OrderHistory.orderCost, StoreFront.storeName FROM OrderInstance LEFT JOIN OrderHistory ON OrderInstance.orderID = OrderHistory.orderID JOIN ShopItem ON OrderInstance.productID = ShopItem.productID JOIN StoreFront ON OrderInstance.storeID = StoreFront.storeID WHERE OrderInstance.userID = 16 ORDER BY OrderHistory.orderDate DESC;",connection);
         break;
     case 3: 
-        cmd = new SqlCommand("SELECT StoreFront.storeName, OrderHistory.orderID, OrderHistory.orderDate, OrderHistory.orderCost, OrderHistory.userID, OrderInstance.productID, OrderInstance.totalPrice, OrderInstance.orderQuantity, ShopItem.productID, ShopItem.productName FROM OrderHistory JOIN OrderInstance ON OrderHistory.orderID = OrderInstance.orderID JOIN ShopItem ON ShopItem.productID = OrderInstance.productID JOIN StoreFront ON ShopItem.storeID = StoreFront.storeID WHERE OrderHistory.userID = @userid ORDER BY orderCost ASC",connection);
+        cmd = new SqlCommand("SELECT OrderInstance.orderID,  OrderInstance.productID, ShopItem.productName , OrderInstance.totalPrice,  OrderInstance.orderQuantity, OrderHistory.orderDate, OrderHistory.orderCost, StoreFront.storeName FROM OrderInstance LEFT JOIN OrderHistory ON OrderInstance.orderID = OrderHistory.orderID JOIN ShopItem ON OrderInstance.productID = ShopItem.productID JOIN StoreFront ON OrderInstance.storeID = StoreFront.storeID WHERE OrderInstance.userID = 16 ORDER BY OrderHistory.orderCost ASC",connection);
         break;
     case 4: 
-        cmd = new SqlCommand("SELECT StoreFront.storeName, OrderHistory.orderID, OrderHistory.orderDate, OrderHistory.orderCost, OrderHistory.userID, OrderInstance.productID, OrderInstance.totalPrice, OrderInstance.orderQuantity, ShopItem.productID, ShopItem.productName FROM OrderHistory JOIN OrderInstance ON OrderHistory.orderID = OrderInstance.orderID JOIN ShopItem ON ShopItem.productID = OrderInstance.productID JOIN StoreFront ON ShopItem.storeID = StoreFront.storeID WHERE OrderHistory.userID = @userid ORDER BY orderCost DESC",connection);
+        cmd = new SqlCommand("SELECT OrderInstance.orderID,  OrderInstance.productID, ShopItem.productName , OrderInstance.totalPrice,  OrderInstance.orderQuantity, OrderHistory.orderDate, OrderHistory.orderCost, StoreFront.storeName FROM OrderInstance LEFT JOIN OrderHistory ON OrderInstance.orderID = OrderHistory.orderID JOIN ShopItem ON OrderInstance.productID = ShopItem.productID JOIN StoreFront ON OrderInstance.storeID = StoreFront.storeID WHERE OrderInstance.userID = 16 ORDER BY OrderHistory.orderCost DESC",connection);
         break;
 };
 cmd.Parameters.AddWithValue("@userid", _userID);
 SqlDataReader reader = cmd.ExecuteReader();
 int orderID = 0;
+/*
+Table Layout:
+0. OrderID - int
+1. ProductID - int
+2. ProductName - string
+3. TotalPrice - float
+4. OrderQuantity - int
+5. OrderDate - getdatetime.tostring()
+6. OrderCost - float
+7. StoreName - string
+*/
+
+
 
 decimal totalPrice = 0;
 decimal orderCost = 0;
@@ -743,22 +749,34 @@ string _ordertext = "";
 
 while(reader.Read())
 {
-    int newOrderID = reader.GetInt32(1);
+    int newOrderID = reader.GetInt32(0);
 
     if(newOrderID != orderID)
     {
         totalPrice = 0;
         _ordertext = "";
         orderID = newOrderID;
-        string orderDate = reader.GetDateTime(2).ToString();
-        orderCost = reader.GetDecimal(3);
-        string storeName = reader.GetString(0);
+        string orderDate = reader.GetDateTime(5).ToString();
+        orderCost = reader.GetDecimal(6);
+        string storeName = reader.GetString(7);
         _ordertext += $"[{newOrderID}]: Ordered at {orderDate}; Total Price: ${orderCost}; Store: {storeName}\n";
     }
 
-    string productQuantity = reader.GetInt32(7).ToString();
-    string productName = reader.GetString(9);
-    decimal productPrice = reader.GetDecimal(6);
+    string productQuantity = reader.GetInt32(4).ToString();
+
+    string productName = "";
+    if(string.IsNullOrWhiteSpace(reader.GetString(2)))
+    {
+        productName = "[No Item]";
+    }
+    else
+    {
+        productName = reader.GetString(2);
+    }
+    //string productName = reader.GetString(2);
+
+
+    decimal productPrice = reader.GetDecimal(3);
     totalPrice += productPrice;
     _ordertext += $"Name: {productName}; Amt bought: {productQuantity}; Amt charged: ${productPrice}\n";
     if(orderCost == totalPrice)

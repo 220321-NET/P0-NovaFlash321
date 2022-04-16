@@ -64,10 +64,10 @@ namespace WebAPI.Controllers
             return await _bl.SearchInventoryAsync(itemName, storeID);
         }
 
-        [HttpPut("{itemName}Price")]
-        public async Task ChangePriceAsync(ShopItem searchedItem, float newPrice, int storeID)
+        [HttpPut("ChangeItemPrice/{itemID}")]
+        public async Task ChangePriceAsync(ShopItem searchedItem)
         {
-            await _bl.ChangePriceAsync(searchedItem, newPrice, storeID);
+            await _bl.ChangePriceAsync(searchedItem, searchedItem.Price, searchedItem.StoreID);
         }
 
         [HttpPut("ChangeStore")]
@@ -137,7 +137,7 @@ namespace WebAPI.Controllers
         }
 
         // DELETE api/<ItemController>/5
-        [HttpDelete("RemoveInventoryItem/{_itemName}/{storeID}")]
+        [HttpPut("RemoveInventoryItem/{_itemName}/{storeID}")]
         public async Task RemoveInventoryItemAsync(string _itemName, int storeID)
         {
             ShopItem _item = new ShopItem()
@@ -148,6 +148,14 @@ namespace WebAPI.Controllers
             await _bl.RemoveItemAsync(_item, storeID);
 
         }
+
+        [HttpGet("GetUserHistory/{_select}/{_userID}")]
+        
+        public async Task<Dictionary<int,string>> GetUserOrderHistoryAsync(int _select, int _userID)
+        {
+            return await _bl.CheckOrderHistoryAsync(_select, _userID);
+        }
+        
 
         [HttpDelete("RemoveOrderItem/{_itemID}/{_userID}")]
         public async Task RemoveOrderItemAsync(int _itemID, int _userID)
