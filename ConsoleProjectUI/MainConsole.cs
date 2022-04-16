@@ -1019,16 +1019,20 @@ private async Task<Dictionary<int, List<ShopItem>>> SearchForOrderAsync(int user
             switch(input)
             {
                 case 'Y': 
-                await AddOrderItemAsync(orderContents, key);
-                break;
+                    await AddOrderItemAsync(orderContents, key);
+                    break;
                 case 'N': 
-                Console.WriteLine("Creating new order");
+                    Console.WriteLine("Creating new order"); 
+                    foreach(ShopItem _item in orderContents)
+                    {
+                        await httpService.RemoveOrderItemAsync(_item.Id, currentUser.UserID);
+                    }
+                    await httpService.CreateOrderAsync(currentUser.UserID);
+                    int cartID = await httpService.GetCartId(currentUser.UserID);
+                    orderContents = new List<ShopItem>();
+                    await AddOrderItemAsync(orderContents, cartID);
+                    break;
 
-                await httpService.CreateOrderAsync(currentUser.UserID);
-                int cartID = await httpService.GetCartId(currentUser.UserID);
-                orderContents = new List<ShopItem>();
-                await AddOrderItemAsync(orderContents, cartID);
-                break;
                 default: Console.WriteLine("Invalid Response!"); goto PNOYesNo;
             };
         }
@@ -1165,7 +1169,6 @@ private async Task RemoveOrderItem()
             await httpService.RemoveOrderItemAsync(_order[indexInput - 1].Id, currentUser.UserID);
             Console.WriteLine($"{_order[indexInput - 1].Name} has been removed from your order!");
             _order.RemoveAt(indexInput - 1);
-            //_bl.SaveOrder(_order);
         }
         else
         {
