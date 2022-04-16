@@ -1,0 +1,3 @@
+G:\Training\Week1\P1\publish\ConsoleProjModel.dll
+G:\Training\Week1\P1\publish\ConsoleProjModel.deps.json
+G:\Training\Week1\P1\publish\ConsoleProjModel.pdb
