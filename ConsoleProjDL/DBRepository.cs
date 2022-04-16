@@ -500,6 +500,26 @@ public async Task SaveOrderAsync(JAModel.OrderInstance _instance)
     connection.Close();
 }
 
+
+
+
+public async Task<string> GetStoreNameAsync(int userID)
+{
+    SqlConnection connection = new SqlConnection(_connectionString);
+    connection.Open();
+    SqlCommand cmd = new  SqlCommand();
+    cmd = new SqlCommand("SELECT StoreFront.storeName FROM StoreFront JOIN Users ON Users.storeID = StoreFront.storeID WHERE Users.userID = @userid", connection);
+    cmd.Parameters.AddWithValue("@userid", userID);
+    SqlDataReader reader = cmd.ExecuteReader();
+    string storeName = "";
+    while(reader.Read())
+    {
+        storeName = reader.GetString(0);
+    }
+    connection.Close();
+    return storeName;
+}
+
 public async Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(int userID)
 {
     List<JAModel.ShopItem> _orderContents = new List<JAModel.ShopItem>();
@@ -560,20 +580,7 @@ public async Task<int> GetCartID(int userID)
 
     }
 
-public async Task<string> GetStoreNameAsync(int userID)
-{
-SqlConnection connection = new SqlConnection(_connectionString);
-connection.Open();
-SqlCommand cmd = new SqlCommand("SELECT StoreFront.storeID, StoreFront.storeName, Users.userID FROM StoreFront JOIN Users ON StoreFront.storeID = Users.storeID WHERE Users.userID = @userid",connection);
-cmd.Parameters.AddWithValue("@userid", userID);
-SqlDataReader reader = cmd.ExecuteReader();
-string _storeName = "";
-while(reader.Read())
-{
-    _storeName = reader.GetString(1);
-}
-return _storeName;
-}
+
 
 public async Task RemoveOrderAsync()
 {

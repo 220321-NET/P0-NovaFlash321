@@ -171,17 +171,21 @@ namespace ConsoleProjectUI
 
         public async Task<string> GetStoreNameAsync(int userID)
         {   
-            //http get
-            Store _store = new Store();
-            return "";
-        //get store name
-        }
+            string url = _apiBaseURL + $"GetStoreName/{userID}";
+            HttpClient client = new HttpClient();
+            string storeName = "";
+            try
+            {
+                storeName = await client.GetStringAsync(url);
 
-        public async Task RemoveOrderCartAsync()
-        {
-        
-        //remove order cart
-        //http delete
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            
+            return storeName;
+        //get store name
         }
 
         public async Task RemoveOrderItemAsync(int _itemID, int _userID)

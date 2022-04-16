@@ -157,6 +157,13 @@ namespace WebAPI.Controllers
         }
         
 
+        [HttpGet("GetStoreName/{userID}")]
+        public async Task<string> GetStoreNameAsync(int userID)
+        {
+            return await _bl.GetStoreNameAsync(userID);
+        }
+
+
         [HttpDelete("RemoveOrderItem/{_itemID}/{_userID}")]
         public async Task RemoveOrderItemAsync(int _itemID, int _userID)
         {
