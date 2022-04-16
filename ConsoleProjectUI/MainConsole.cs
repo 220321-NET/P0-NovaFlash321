@@ -1185,6 +1185,7 @@ private async Task ConfirmOrderAsync()
 {
     Dictionary<int, List<ShopItem>> _orderContents = await SearchForOrderAsync(currentUser.UserID);
     int key = await httpService.GetCartId(currentUser.UserID);
+
     if(_orderContents.ContainsKey(0))
     {
         Console.WriteLine("Your cart is currently empty!");
@@ -1194,6 +1195,7 @@ private async Task ConfirmOrderAsync()
     float totalPrice = 0;
     if(_order.Count > 0)
     {
+
 
         Console.WriteLine("Your current order");
         int index = 1;
@@ -1229,6 +1231,7 @@ private async Task ConfirmOrderAsync()
             case 'N':
                 break;
         }
+
     }
     else
     {

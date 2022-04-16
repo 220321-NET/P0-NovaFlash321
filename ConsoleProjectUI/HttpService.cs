@@ -377,7 +377,9 @@ namespace ConsoleProjectUI
             _searchedItem.StoreID = _storeID;
             string serializedItem = JsonSerializer.Serialize(_searchedItem);
             StringContent content = new StringContent(serializedItem, Encoding.UTF8, "application/json");
+
             HttpClient client = new HttpClient();
+
             try
             {
                 HttpResponseMessage response = await client.DeleteAsync(url);

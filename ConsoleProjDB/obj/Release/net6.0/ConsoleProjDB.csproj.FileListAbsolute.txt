@@ -1,0 +1,12 @@
+G:\Training\Week1\P1\ConsoleProjDB\bin\Release\net6.0\ConsoleProjDB.deps.json
+G:\Training\Week1\P1\ConsoleProjDB\bin\Release\net6.0\ConsoleProjDB.dll
+G:\Training\Week1\P1\ConsoleProjDB\bin\Release\net6.0\ConsoleProjDB.pdb
+G:\Training\Week1\P1\ConsoleProjDB\obj\Release\net6.0\ConsoleProjDB.csproj.AssemblyReference.cache
+G:\Training\Week1\P1\ConsoleProjDB\obj\Release\net6.0\ConsoleProjDB.GeneratedMSBuildEditorConfig.editorconfig
+G:\Training\Week1\P1\ConsoleProjDB\obj\Release\net6.0\ConsoleProjDB.AssemblyInfoInputs.cache
+G:\Training\Week1\P1\ConsoleProjDB\obj\Release\net6.0\ConsoleProjDB.AssemblyInfo.cs
+G:\Training\Week1\P1\ConsoleProjDB\obj\Release\net6.0\ConsoleProjDB.csproj.CoreCompileInputs.cache
+G:\Training\Week1\P1\ConsoleProjDB\obj\Release\net6.0\ConsoleProjDB.dll
+G:\Training\Week1\P1\ConsoleProjDB\obj\Release\net6.0\refint\ConsoleProjDB.dll
+G:\Training\Week1\P1\ConsoleProjDB\obj\Release\net6.0\ConsoleProjDB.pdb
+G:\Training\Week1\P1\ConsoleProjDB\obj\Release\net6.0\ref\ConsoleProjDB.dll
