@@ -18,10 +18,10 @@ public interface IRepo
     Task ChangePriceAsync(JAModel.ShopItem _item, float _price, int storeID);
     Task RemoveItemAsync(JAModel.ShopItem _item, int storeID);
     Task ChangeStoreAsync(int _newID, JAModel.UserPass _currentUser);
-    Task<List<JAModel.ShopItem>> SearchForOrderAsync();
+    Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(int userID);
     Task AddOrderItemAsync();
     Task RemoveOrderAsync();
-    Task ConfirmOrderAsync(List<JAModel.ShopItem> _order, int storeID, int userID);
+    Task ConfirmOrderAsync(Dictionary<int, List<JAModel.ShopItem>> Order);
     /// <summary>
 /// Checks the order history of the user that is logged in
 /// </summary>
@@ -30,5 +30,11 @@ public interface IRepo
 /// <returns>Currently returns list of strings that describe orders, but needs to return dictionary</returns>
     Task<Dictionary<int, string>> CheckOrderHistoryAsync(int _select, int _userID);
     Task<string> GetStoreNameAsync(int userID);
-    Task SaveOrderAsync(List<JAModel.ShopItem> _order);
+    Task SaveOrderAsync(JAModel.OrderInstance _instance);
+    Task CreateOrderAsync(int userID);
+    Task<int> GetCartID(int userID);
+    Task RemoveOrderItemAsync(int _itemID, int _userID);
+
 }
+
+    

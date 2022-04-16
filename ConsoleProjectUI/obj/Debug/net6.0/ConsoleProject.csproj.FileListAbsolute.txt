@@ -1,0 +1,15 @@
+G:\Training\Week1\P0\ConsoleProject\bin\Debug\net6.0\ConsoleProject.exe
+G:\Training\Week1\P0\ConsoleProject\bin\Debug\net6.0\ConsoleProject.deps.json
+G:\Training\Week1\P0\ConsoleProject\bin\Debug\net6.0\ConsoleProject.runtimeconfig.json
+G:\Training\Week1\P0\ConsoleProject\bin\Debug\net6.0\ConsoleProject.dll
+G:\Training\Week1\P0\ConsoleProject\bin\Debug\net6.0\ConsoleProject.pdb
+G:\Training\Week1\P0\ConsoleProject\obj\Debug\net6.0\ConsoleProject.csproj.AssemblyReference.cache
+G:\Training\Week1\P0\ConsoleProject\obj\Debug\net6.0\ConsoleProject.GeneratedMSBuildEditorConfig.editorconfig
+G:\Training\Week1\P0\ConsoleProject\obj\Debug\net6.0\ConsoleProject.AssemblyInfoInputs.cache
+G:\Training\Week1\P0\ConsoleProject\obj\Debug\net6.0\ConsoleProject.AssemblyInfo.cs
+G:\Training\Week1\P0\ConsoleProject\obj\Debug\net6.0\ConsoleProject.csproj.CoreCompileInputs.cache
+G:\Training\Week1\P0\ConsoleProject\obj\Debug\net6.0\ConsoleProject.dll
+G:\Training\Week1\P0\ConsoleProject\obj\Debug\net6.0\refint\ConsoleProject.dll
+G:\Training\Week1\P0\ConsoleProject\obj\Debug\net6.0\ConsoleProject.pdb
+G:\Training\Week1\P0\ConsoleProject\obj\Debug\net6.0\ConsoleProject.genruntimeconfig.cache
+G:\Training\Week1\P0\ConsoleProject\obj\Debug\net6.0\ref\ConsoleProject.dll

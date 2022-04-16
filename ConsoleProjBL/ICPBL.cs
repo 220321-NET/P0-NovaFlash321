@@ -82,7 +82,7 @@ public interface IJABL
     /// Searches if an order exists with the user that is currently logged in
     /// </summary>
     /// <returns>Returns a list that the user can resume shopping with</returns>
-    Task<List<JAModel.ShopItem>> SearchForOrderAsync();
+    Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(int userID);
     Task AddOrderItemAsync();
     Task RemoveOrderAsync();
     /// <summary>
@@ -91,7 +91,7 @@ public interface IJABL
     /// <param name="_order">The list of items in the user's order</param>
     /// <param name="storeID">The store ID that the user is shopping at, that the inventory is taken from</param>
     /// <param name="userID">Gets current ID from the user that is logged in</param>
-    Task ConfirmOrderAsync(List<JAModel.ShopItem> _order, int storeID, int userID);
+    Task ConfirmOrderAsync(Dictionary<int, List<JAModel.ShopItem>> Order);
         /// <summary>
 /// Checks the order history of the user that is logged in
 /// </summary>
@@ -103,12 +103,15 @@ public interface IJABL
     /// Saves the order to a JSON file, that can be used later
     /// </summary>
     /// <param name="_order">The list that the user has on hand currently, which will be saved with</param>
-    Task SaveOrderAsync(List<JAModel.ShopItem> _order);
+    Task SaveOrderAsync(JAModel.OrderInstance _instance);
     /// <summary>
     /// Gets the store name that the user is shopping at
     /// </summary>
     /// <param name="userID">Gets the ID of the current user that is shopping</param>
     /// <returns></returns>
     Task<string> GetStoreNameAsync(int userID);
+    Task CreateOrderAsync(int userID);
+    Task<int> GetCartID(int userID);
+    Task RemoveOrderItemAsync(int _itemID, int _userID);
 
 }
