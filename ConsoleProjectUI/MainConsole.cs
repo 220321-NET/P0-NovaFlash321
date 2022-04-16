@@ -1022,7 +1022,7 @@ private async Task<Dictionary<int, List<ShopItem>>> SearchForOrderAsync(int user
                     await AddOrderItemAsync(orderContents, key);
                     break;
                 case 'N': 
-                    Console.WriteLine("Creating new order");
+                    Console.WriteLine("Creating new order"); 
                     foreach(ShopItem _item in orderContents)
                     {
                         await httpService.RemoveOrderItemAsync(_item.Id, currentUser.UserID);
