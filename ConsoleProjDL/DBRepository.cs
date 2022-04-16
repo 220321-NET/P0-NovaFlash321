@@ -401,6 +401,27 @@ connection.Close();
 return item;
 }
 
+public async Task RemoveOrderItemAsync(int _itemID, int _userID)
+{
+    SqlConnection connection = new SqlConnection(_connectionString);
+    connection.Open();
+    SqlCommand cmd = new SqlCommand();
+    cmd = new SqlCommand("DELETE FROM CartInstance WHERE productID = @productid AND userID = @userid", connection);
+    cmd.Parameters.AddWithValue("@productid", _itemID);
+    cmd.Parameters.AddWithValue("@userid",_userID);
+
+    try
+    {
+        cmd.ExecuteNonQuery();
+    }
+    catch(Exception e)
+    {
+        Console.WriteLine(e.Message);
+    }
+
+    connection.Close();
+}
+
 
 public async Task RemoveItemAsync(JAModel.ShopItem _item, int storeID)
 {
@@ -409,7 +430,7 @@ connection.Open();
 SqlCommand cmd = new SqlCommand();
 cmd = new SqlCommand("DELETE FROM ShopItem WHERE productName = @name AND storeID = @storeid",connection);
 cmd.Parameters.AddWithValue("@name", _item.Name);
-cmd.Parameters.AddWithValue("storeid", storeID);
+cmd.Parameters.AddWithValue("@storeid", storeID);
 
 try
 {
@@ -466,42 +487,89 @@ connection.Close();
 }
 
 
-public async Task SaveOrderAsync(List<JAModel.ShopItem> _order)
+public async Task SaveOrderAsync(JAModel.OrderInstance _instance)
 {
-string jsonContents = JsonSerializer.Serialize(_order);
-File.WriteAllText(orderFilePath, jsonContents);
+// string jsonContents = JsonSerializer.Serialize(_order);
+// File.WriteAllText(orderFilePath, jsonContents);
+    SqlConnection connection = new SqlConnection(_connectionString);
+    connection.Open();
+    SqlCommand cmd = new SqlCommand();
+    cmd = new SqlCommand("INSERT INTO CartInstance(cartID, userID, productID, orderQuantity) VALUES(@cartid, @userid, @productid, @productquantity)", connection);
+    cmd.Parameters.AddWithValue("@cartid", _instance.CartID);
+    cmd.Parameters.AddWithValue("@userid", _instance.UserID);
+    cmd.Parameters.AddWithValue("@productid", _instance.ItemId);
+    cmd.Parameters.AddWithValue("@productquantity", _instance.ProductQuantity);
 
+    try
+    {
+        cmd.ExecuteNonQuery();
+    }
+    catch(Exception e)
+    {
+        LogError(e);
+    }
+    connection.Close();
+}
+
+public async Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(int userID)
+{
+    List<JAModel.ShopItem> _orderContents = new List<JAModel.ShopItem>();
+    JAModel.ShopItem _item = new JAModel.ShopItem();
     
+    int _cartid = 0;
+    SqlConnection connection = new SqlConnection(_connectionString);
+    connection.Open();
+    SqlCommand cmd = new SqlCommand();
+    cmd = new SqlCommand("SELECT CartInstance.cartID, CartInstance.userID, CartInstance.productID, CartInstance.orderQuantity, ShopItem.productName, ShopItem.productPrice, ShopItem.storeID FROM CartInstance JOIN ShopItem ON CartInstance.productID = ShopItem.productID WHERE userID = @userid",connection);
+    cmd.Parameters.AddWithValue("@userid", userID);
+    SqlDataReader reader = cmd.ExecuteReader();
+    while(reader.Read())
+    {
+        _cartid = reader.GetInt32(0);
+        int productID = reader.GetInt32(2);
+        int quantity = reader.GetInt32(3);
+        string name = reader.GetString(4);
+        decimal price = reader.GetDecimal(5);
+        int storeID = reader.GetInt32(6);
+
+        _item = new JAModel.ShopItem
+        {
+            Id = productID,
+            Name = name,
+            Quantity = quantity,
+            Price = (float)price,
+            StoreID = storeID
+
+        };
+        _orderContents.Add(_item);
+    }
+    Dictionary<int, List<JAModel.ShopItem>> order = new Dictionary<int, List<JAModel.ShopItem>>();
+    order.Add(_cartid, _orderContents);
+    connection.Close();
+    return order;
 }
 
-public async Task<List<JAModel.ShopItem>> SearchForOrderAsync()
-{
-string jsonContents = "";
-try
-{
-    jsonContents = File.ReadAllText(orderFilePath);
-}
-catch(Exception e)
-{
-    Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
-}
-List<JAModel.ShopItem> _order = new List<JAModel.ShopItem>();
-try
-{
-    _order = JsonSerializer.Deserialize<List<JAModel.ShopItem>>(jsonContents) ?? new List<JAModel.ShopItem>();
-
-}
-catch(Exception e)
-{
-    Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
-}
-
-return _order;
-}
-public async Task AddOrderItemAsync()
+public async Task<int> GetCartID(int userID)
 {   
+    int cartID = 0;
 
+    SqlConnection connection = new SqlConnection(_connectionString);
+    connection.Open();
+    SqlCommand cmd = new SqlCommand();
+    cmd = new SqlCommand("SELECT cartID FROM Carts WHERE userID = @userid", connection);
+    cmd.Parameters.AddWithValue("@userid", userID);
+    SqlDataReader reader = cmd.ExecuteReader();
+    while(reader.Read())
+    {
+        cartID = reader.GetInt32(0);
+    }
+    connection.Close();
+    return cartID;
 }
+    public async Task AddOrderItemAsync()
+    {   
+
+    }
 
 public async Task<string> GetStoreNameAsync(int userID)
 {
@@ -523,14 +591,20 @@ public async Task RemoveOrderAsync()
 string jsonContents = "[]";
 File.WriteAllText(orderFilePath, jsonContents);
 }
-public async Task ConfirmOrderAsync(List<JAModel.ShopItem> _order, int storeID, int userID)
+public async Task ConfirmOrderAsync(Dictionary<int, List<JAModel.ShopItem>> Order)
 {
-List<JAModel.ShopItem> _curInventory = new List<JAModel.ShopItem>();
+    int userID = 0;
+    List<JAModel.ShopItem> _curInventory = new List<JAModel.ShopItem>();
+    foreach(KeyValuePair<int, List<JAModel.ShopItem>> Contents in Order)
+    {
+        userID = Contents.Key;
+    }
+    List<JAModel.ShopItem> _order = Order[userID];
 SqlConnection connection = new SqlConnection(_connectionString);
 
 connection.Open();
 SqlCommand neworder = new SqlCommand("INSERT INTO OrderHistory (userID, orderDate) VALUES (@userid, GETDATE())", connection);
-neworder.Parameters.AddWithValue("userid", userID);
+neworder.Parameters.AddWithValue("@userid", userID);
 
 try
 {
@@ -538,7 +612,8 @@ try
 }
 catch(Exception e)
 {
-    Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
+    Console.WriteLine(e.Message);
+    //Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
 }
 connection.Close();
 connection.Open();
@@ -558,28 +633,29 @@ float totalPrice = 0f;
 foreach(JAModel.ShopItem _item in _order)
 {
     connection.Open();
-    SqlCommand cmd = new SqlCommand("SELECT * FROM ShopItem WHERE productName = @name AND storeID = @storeid", connection);
-    cmd.Parameters.AddWithValue("@name", _item.Name);
-    cmd.Parameters.AddWithValue("@storeid", storeID);
+    SqlCommand cmd = new SqlCommand("SELECT * FROM ShopItem WHERE productID = @productid", connection);
+    cmd.Parameters.AddWithValue("@productid", _item.Id);
+
     SqlDataReader reader = cmd.ExecuteReader();
     int quantity = 0;
     while(reader.Read())
     {
-        quantity = (reader.GetInt32(3)) - _item.Quantity;
+        quantity = ((reader.GetInt32(3)) - _item.Quantity);
     }
     connection.Close();
     connection.Open();
-    cmd = new SqlCommand("UPDATE ShopItem SET productQuantity = @quantity WHERE productName = @name AND storeID = @storeid",connection);
+    cmd = new SqlCommand("UPDATE ShopItem SET productQuantity = @quantity WHERE productID = @productid",connection);
     cmd.Parameters.AddWithValue("@quantity", quantity);
-    cmd.Parameters.AddWithValue("@name", _item.Name);
-    cmd.Parameters.AddWithValue("@storeid", storeID);
+    cmd.Parameters.AddWithValue("@productid", _item.Id);
+
     try
     {
         cmd.ExecuteNonQuery();
     }
     catch(Exception e)
     {
-        Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
+        Console.WriteLine(e.Message);
+        //Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
     }
     connection.Close();
     totalPrice += (_item.Price * _item.Quantity);
@@ -591,8 +667,8 @@ foreach(JAModel.ShopItem _item in _order)
     connection.Open();
     SqlCommand ordercmd = new SqlCommand("INSERT INTO OrderInstance(orderID, storeID, totalPrice, userID, productID, orderQuantity)  VALUES(@orderid, @storeid, @totalprice, @userid, @productid, @quantity)", connection);
     ordercmd.Parameters.AddWithValue("@orderid", orderID);
-    ordercmd.Parameters.AddWithValue("@storeid", storeID);
-    ordercmd.Parameters.AddWithValue("@totalprice", float.Parse((_item.Price * _item.Quantity).ToString("###.00")));
+    ordercmd.Parameters.AddWithValue("@storeid", _item.StoreID);
+    ordercmd.Parameters.AddWithValue("@totalprice", float.Parse((_item.Price * _item.Quantity).ToString("######.00")));
     ordercmd.Parameters.AddWithValue("@userid", userID);
     ordercmd.Parameters.AddWithValue("@productid", _item.Id);
     ordercmd.Parameters.AddWithValue("@quantity", _item.Quantity);
@@ -603,7 +679,8 @@ foreach(JAModel.ShopItem _item in _order)
     }
     catch(Exception e)
     {
-            Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
+        Console.WriteLine(e.Message);
+            //Console.WriteLine("Runtime Error. Check ConsoleLog.json for more info"); LogError(e);
     }
     connection.Close();
 }   
@@ -719,12 +796,32 @@ SELECT OrderHistory.orderID, OrderHistory.orderDate, OrderHistory.orderCost, Ord
 
 }
 
-private void LogError(Exception e)
-{
-string jsonContents = JsonSerializer.Serialize(e.Message);
-File.WriteAllText(errorFilePath, jsonContents);
+    public async Task CreateOrderAsync(int userID)
+    {
+        SqlConnection connection = new SqlConnection(_connectionString);
+        connection.Open();
+        SqlCommand cmd = new SqlCommand();
+        cmd = new SqlCommand("INSERT INTO Carts(userID) VALUES (@userID)", connection);
+        cmd.Parameters.AddWithValue("@userID",userID);
+        try
+        {
+            cmd.ExecuteNonQuery();
+        }
+        catch(Exception e)
+        {
+            LogError(e);
+        }
+    }
 
-}
+    
+
+
+    private void LogError(Exception e)
+    {
+    string jsonContents = JsonSerializer.Serialize(e.Message);
+    File.WriteAllText(errorFilePath, jsonContents);
+
+    }
 
 }
 
