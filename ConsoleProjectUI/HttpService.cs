@@ -306,6 +306,25 @@ namespace ConsoleProjectUI
 
             return _history;
         }
+        public async Task<Dictionary<int,string>> CheckOrderHistoryAsyncAdmin(int _select, int _storeID)
+        {
+            string url = _apiBaseURL + $"GetStoreHistory/{_select}/{_storeID}";
+
+            Dictionary<int,string> _history = new Dictionary<int, string>();
+            HttpClient client = new HttpClient();
+            try
+            {
+                string responseString = await client.GetStringAsync(url);
+                _history = JsonSerializer.Deserialize<Dictionary<int, string>>(responseString) ?? new Dictionary<int, string>();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+
+            return _history;
+        }
 
         public async Task ChangeStoreAsync(int _storeID, UserPass _currentUser)
         {

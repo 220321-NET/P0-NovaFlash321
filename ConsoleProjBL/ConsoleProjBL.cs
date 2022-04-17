@@ -128,6 +128,10 @@ public async Task< Dictionary<int, string>> CheckOrderHistoryAsync(int _select, 
 {
     return await _repo.CheckOrderHistoryAsync(_select, _userID);
 }
+public async Task<Dictionary<int, string>> CheckOrderHistoryAsyncAdmin(int _select, int _storeID)
+{
+    return await _repo.CheckOrderHistoryAsyncAdmin(_select, _storeID);
+}
 
 
     #endregion

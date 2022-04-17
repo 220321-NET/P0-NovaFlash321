@@ -99,6 +99,7 @@ public interface IJABL
 /// <param name="_userID">Gets current ID from that is logged in</param>
 /// <returns>Returns the order history based on the user that is currently logged in</returns>
     Task<Dictionary<int, string>> CheckOrderHistoryAsync(int _select, int _userID);
+        Task<Dictionary<int, string>> CheckOrderHistoryAsyncAdmin(int _select, int _storeID);
     /// <summary>
     /// Saves the order to a JSON file, that can be used later
     /// </summary>

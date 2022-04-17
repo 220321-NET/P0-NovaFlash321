@@ -308,6 +308,7 @@ namespace JAConsole;
             +"\n4. Add a new administrator"
             +"\n5. Add a new store"
             +"\n6. Change store"
+            +"\n7. View Store Order History"
             +"\nX. Exit"
             );
 
@@ -326,6 +327,7 @@ namespace JAConsole;
             case '4': await CreateNewAdminAsync(); break;
             case '5': await CreateNewStoreAsync(); break;
             case '6': await ChangeStore(); break;
+            case '7': await GetStoreOrderHistoryAsync(); break;
             case 'x':
                 Console.WriteLine("Returning to Login"); 
                 loggedIn = false;
@@ -343,6 +345,46 @@ namespace JAConsole;
         
         }while(loggedIn);
     }
+
+
+    private async Task GetStoreOrderHistoryAsync()
+    {
+            SOHValidation:
+        Console.WriteLine("How do you wish to view your order history?");
+        Console.WriteLine(
+            "1. View by date (oldest to newest)"
+            +"\n2. View by date(newest to oldest)"
+            +"\n3. View by price(lowest to highest)"
+            +"\n4. View by price(highest to lowest)");
+        string? uInput = Console.ReadLine();
+        if(string.IsNullOrWhiteSpace(uInput))
+        {
+            Console.WriteLine("Invalid Response!");
+            goto SOHValidation;
+        }
+        char input = uInput[0];
+        int select = input - '0';
+        
+        if(select >= 1 && select <= 4)
+        {
+            Dictionary<int, string> orderHistory = await httpService.CheckOrderHistoryAsyncAdmin(select, currentUser.StoreID);
+            string storeName = await httpService.GetStoreNameAsync(currentUser.UserID);
+            Console.WriteLine("Order history for: " + storeName);
+            foreach(KeyValuePair<int,string> _order in orderHistory)
+            {
+                Console.WriteLine(_order.Value);
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid Response!");
+            goto SOHValidation;
+        }
+
+    }
+
+
+
     private async Task CreateNewStoreAsync()
     {
         StoreName:

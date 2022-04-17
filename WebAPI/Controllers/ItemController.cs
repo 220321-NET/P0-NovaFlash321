@@ -148,7 +148,11 @@ namespace WebAPI.Controllers
             await _bl.RemoveItemAsync(_item, storeID);
 
         }
-
+        [HttpGet("GetStoreHistory/{_select}/{_storeID}")]
+        public async Task<Dictionary<int, string>> GetStoreHistoryAsync(int _select, int _storeID)
+        {
+            return await _bl.CheckOrderHistoryAsyncAdmin(_select, _storeID);
+        }
         [HttpGet("GetUserHistory/{_select}/{_userID}")]
         
         public async Task<Dictionary<int,string>> GetUserOrderHistoryAsync(int _select, int _userID)
