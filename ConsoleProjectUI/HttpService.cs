@@ -121,7 +121,7 @@ namespace ConsoleProjectUI
             {
                 HttpResponseMessage response = await client.PostAsync(url, content);
                 response.EnsureSuccessStatusCode();
-                Console.WriteLine("Shop Successfully Created!");
+
             }
             catch(HttpRequestException e)
             {

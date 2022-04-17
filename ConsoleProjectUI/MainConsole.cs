@@ -55,24 +55,28 @@ namespace JAConsole;
                         case '1': 
                             await CheckAdminAsync(); 
                             if(hasAdminPrivilages)
-                            {
+                            {   
+                                SuccessBeep();
                                 await AdminMainMenuAsync();
-                                break;
                             }
                             else
                             {
+                                ErrorBeep();
                                 Console.WriteLine("You do not have admin privilages!");
-                                break;
+                                
                             }
+                            break;
                         case '2': 
                             await CheckUserAsync();
                             if(hasAdminPrivilages || hasUserPrivilages)
                             {
+                                SuccessBeep();
                                 await UserMainMenu();
                             }
                             else
                             {
                                 Console.WriteLine("You do not have any privilages!");
+                                ErrorBeep();
                             }
                             break;
                         case '3':
@@ -518,7 +522,10 @@ namespace JAConsole;
                 switch(input)
                 {
                     case 'Y': 
+
                         await httpService.CreateNewStoreAsync(newStore);
+
+                        Console.WriteLine("Store successfully added!");
                         
                         break;
                     case 'N':
@@ -724,6 +731,8 @@ namespace JAConsole;
                 {
                     case 'Y':
                         await httpService.CreateNewFoodItemAsync(_item, currentUser.StoreID);
+
+                        Console.WriteLine("Item added to inventory!");
                         break;
                     case 'N':
                         Console.WriteLine("Returning to Admin Menu!");
@@ -1411,7 +1420,17 @@ private async Task ChangeStore()
     }
 
 }
-
+    private void SuccessBeep()
+    {
+        Console.Beep(440, 170);
+        Console.Beep(523, 400);
+    }
+    
+    private void ErrorBeep()
+    {
+        Console.Beep(440, 170);
+        Console.Beep(246, 400);
+    }
 
 } //End of Line
 
