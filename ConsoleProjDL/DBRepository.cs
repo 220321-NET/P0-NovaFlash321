@@ -700,6 +700,42 @@ File.WriteAllText(orderFilePath, jsonContents);
 
 //use dictionary
 
+public async Task<List<JAModel.ShopItem>> GetStoreInventoryAsync(int _storeID)
+{
+    SqlConnection  connection = new SqlConnection(_connectionString);
+    connection.Open();
+    List<JAModel.ShopItem> _inventory = new List<JAModel.ShopItem>();
+    SqlCommand cmd = new SqlCommand();
+    cmd = new SqlCommand("SELECT * FROM SHOPITEM WHERE storeID = @storeid AND productQuantity > 0", connection);
+    cmd.Parameters.AddWithValue("@storeid", _storeID);
+    SqlDataReader reader = cmd.ExecuteReader();
+    while(reader.Read())
+    {
+        int productid = reader.GetInt32(0);
+        string productname = reader.GetString(1);
+        decimal productprice = reader.GetDecimal(2);
+        int productquantity = reader.GetInt32(3);
+        string productype = reader.GetString(5);
+
+
+        JAModel.ShopItem _item = new JAModel.ShopItem
+        {
+            Id = productid,
+            Name = productname,
+            Price = (float)productprice,
+            Quantity = productquantity,
+            TypeOfFood = productype
+
+        };
+
+        _inventory.Add(_item);
+    }
+    connection.Close();
+    return _inventory;
+}
+
+
+
 public async Task<Dictionary<int, string>> CheckOrderHistoryAsyncAdmin(int _select, int _storeID)
 {
 Dictionary<int,string> orderHistory = new Dictionary<int, string>();

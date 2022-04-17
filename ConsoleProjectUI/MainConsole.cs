@@ -309,6 +309,7 @@ namespace JAConsole;
             +"\n5. Add a new store"
             +"\n6. Change store"
             +"\n7. View Store Order History"
+            +"\n8. View Store Inventory"
             +"\nX. Exit"
             );
 
@@ -328,6 +329,7 @@ namespace JAConsole;
             case '5': await CreateNewStoreAsync(); break;
             case '6': await ChangeStore(); break;
             case '7': await GetStoreOrderHistoryAsync(); break;
+            case '8': await ViewStoreInventoryAsync(); break;
             case 'x':
                 Console.WriteLine("Returning to Login"); 
                 loggedIn = false;
@@ -346,6 +348,48 @@ namespace JAConsole;
         }while(loggedIn);
     }
 
+    private async Task ViewStoreInventoryAsync()
+    {
+        string storeName = await httpService.GetStoreNameAsync(currentUser.UserID);
+        Console.WriteLine($"Store Inventory for: {storeName}");
+        List<ShopItem> _inventory = await httpService.GetStoreInventoryAsync(currentUser.StoreID);
+        int index = 1;
+        int menuSize = 5;
+
+        foreach(ShopItem _item in _inventory)
+        {
+            Console.WriteLine($"[Item #{index}]: [{_item.Id}]: {_item.Name}\nPrice: ${_item.Price.ToString("######.00")}\nAmount in Inventory: {_item.Quantity}\nType of Product: {_item.TypeOfFood}\n");
+            if(index % 5 == 0)
+            {
+                VSIConfirm:
+                Console.WriteLine($"View next {menuSize} items? [Y/N]");
+                string? response = Console.ReadLine();
+                if(string.IsNullOrWhiteSpace(response))
+                {
+                    Console.WriteLine("Invalid!");
+                    goto VSIConfirm;
+                }
+                else
+                {
+                    response = response.ToUpper();
+                    char input = response[0];
+                    switch(input)
+                    {
+                        case 'Y': 
+                            index++; 
+                            continue;
+                        case 'N': 
+                            break;
+                        default:
+                            Console.WriteLine("Invalid response!");
+                            goto VSIConfirm;
+                    }
+                }
+            }
+            
+            index++;
+        }
+    }
 
     private async Task GetStoreOrderHistoryAsync()
     {
@@ -480,6 +524,9 @@ namespace JAConsole;
                     case 'N':
                         Console.WriteLine("Returning to Admin Menu!");
                         return;
+                    default:
+                        Console.WriteLine("Invalid response!");
+                        goto CStore;
                 }
 
 

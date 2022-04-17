@@ -160,6 +160,12 @@ namespace WebAPI.Controllers
             return await _bl.CheckOrderHistoryAsync(_select, _userID);
         }
         
+        [HttpGet("GetStoreInventory/{storeID}")]
+        public async Task<List<ShopItem>> GetStoreInventoryAsync(int storeID)
+        {
+            return await _bl.GetStoreInventoryAsync(storeID);
+        }
+
 
         [HttpGet("GetStoreName/{userID}")]
         public async Task<string> GetStoreNameAsync(int userID)

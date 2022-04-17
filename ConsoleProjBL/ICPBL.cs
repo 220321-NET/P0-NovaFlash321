@@ -110,7 +110,9 @@ public interface IJABL
     /// </summary>
     /// <param name="userID">Gets the ID of the current user that is shopping</param>
     /// <returns></returns>
+
     Task<string> GetStoreNameAsync(int userID);
+    Task<List<JAModel.ShopItem>> GetStoreInventoryAsync(int _storeID);
     Task CreateOrderAsync(int userID);
     Task<int> GetCartID(int userID);
     Task RemoveOrderItemAsync(int _itemID, int _userID);

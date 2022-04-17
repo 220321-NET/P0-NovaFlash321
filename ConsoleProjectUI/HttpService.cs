@@ -425,5 +425,24 @@ namespace ConsoleProjectUI
             }
 
         }
+
+        public async Task<List<ShopItem>> GetStoreInventoryAsync(int storeID)
+        {
+            string url = _apiBaseURL + $"GetStoreInventory/{storeID}";
+            List<ShopItem> _inventory = new List<ShopItem>();
+            HttpClient client = new HttpClient();
+
+            try
+            {
+                string responseString = await client.GetStringAsync(url);
+                _inventory = JsonSerializer.Deserialize<List<ShopItem>>(responseString) ?? new List<ShopItem>();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return _inventory;
+        }
+
     }
 }

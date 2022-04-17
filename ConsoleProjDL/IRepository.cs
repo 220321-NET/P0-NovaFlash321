@@ -35,7 +35,7 @@ public interface IRepo
     Task CreateOrderAsync(int userID);
     Task<int> GetCartID(int userID);
     Task RemoveOrderItemAsync(int _itemID, int _userID);
-
+    Task<List<JAModel.ShopItem>> GetStoreInventoryAsync(int _storeID);
 }
 
     
