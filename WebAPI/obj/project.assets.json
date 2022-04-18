@@ -3305,11 +3305,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "G:\\Training\\Week1\\P1\\WebAPI\\WebAPI.csproj",
+      "projectUniqueName": "g:\\Training\\Week1\\P1\\WebAPI\\WebAPI.csproj",
       "projectName": "WebAPI",
-      "projectPath": "G:\\Training\\Week1\\P1\\WebAPI\\WebAPI.csproj",
+      "projectPath": "g:\\Training\\Week1\\P1\\WebAPI\\WebAPI.csproj",
       "packagesPath": "C:\\Users\\Nova\\.nuget\\packages\\",
-      "outputPath": "G:\\Training\\Week1\\P1\\WebAPI\\obj\\",
+      "outputPath": "g:\\Training\\Week1\\P1\\WebAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -3330,17 +3330,17 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "G:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj": {
-              "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj"
+            "g:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj": {
+              "projectPath": "g:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj"
             },
-            "G:\\Training\\Week1\\P1\\ConsoleProjDL\\ConsoleProjDL.csproj": {
-              "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjDL\\ConsoleProjDL.csproj"
+            "g:\\Training\\Week1\\P1\\ConsoleProjDL\\ConsoleProjDL.csproj": {
+              "projectPath": "g:\\Training\\Week1\\P1\\ConsoleProjDL\\ConsoleProjDL.csproj"
             },
-            "G:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj": {
-              "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj"
+            "g:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj": {
+              "projectPath": "g:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj"
             },
-            "G:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj": {
-              "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj"
+            "g:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj": {
+              "projectPath": "g:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj"
             }
           }
         }

@@ -2371,11 +2371,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "g:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj",
+      "projectUniqueName": "G:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj",
       "projectName": "ConsoleProjBL",
-      "projectPath": "g:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj",
+      "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj",
       "packagesPath": "C:\\Users\\Nova\\.nuget\\packages\\",
-      "outputPath": "g:\\Training\\Week1\\P1\\ConsoleProjBL\\obj\\",
+      "outputPath": "G:\\Training\\Week1\\P1\\ConsoleProjBL\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
