@@ -1,4 +1,3 @@
-//CHECK FOR THIS IN TESTBRANCH
 using JAModel;
 using JAConsoleBL;
 using System.ComponentModel.DataAnnotations;
@@ -56,24 +55,28 @@ namespace JAConsole;
                         case '1': 
                             await CheckAdminAsync(); 
                             if(hasAdminPrivilages)
-                            {
+                            {   
+                                SuccessBeep();
                                 await AdminMainMenuAsync();
-                                break;
                             }
                             else
                             {
+                                ErrorBeep();
                                 Console.WriteLine("You do not have admin privilages!");
-                                break;
+                                
                             }
+                            break;
                         case '2': 
                             await CheckUserAsync();
                             if(hasAdminPrivilages || hasUserPrivilages)
                             {
+                                SuccessBeep();
                                 await UserMainMenu();
                             }
                             else
                             {
                                 Console.WriteLine("You do not have any privilages!");
+                                ErrorBeep();
                             }
                             break;
                         case '3':
@@ -309,6 +312,8 @@ namespace JAConsole;
             +"\n4. Add a new administrator"
             +"\n5. Add a new store"
             +"\n6. Change store"
+            +"\n7. View Store Order History"
+            +"\n8. View Store Inventory"
             +"\nX. Exit"
             );
 
@@ -327,6 +332,8 @@ namespace JAConsole;
             case '4': await CreateNewAdminAsync(); break;
             case '5': await CreateNewStoreAsync(); break;
             case '6': await ChangeStore(); break;
+            case '7': await GetStoreOrderHistoryAsync(); break;
+            case '8': await ViewStoreInventoryAsync(); break;
             case 'x':
                 Console.WriteLine("Returning to Login"); 
                 loggedIn = false;
@@ -344,6 +351,88 @@ namespace JAConsole;
         
         }while(loggedIn);
     }
+
+    private async Task ViewStoreInventoryAsync()
+    {
+        string storeName = await httpService.GetStoreNameAsync(currentUser.UserID);
+        Console.WriteLine($"Store Inventory for: {storeName}");
+        List<ShopItem> _inventory = await httpService.GetStoreInventoryAsync(currentUser.StoreID);
+        int index = 1;
+        int menuSize = 5;
+
+        foreach(ShopItem _item in _inventory)
+        {
+            Console.WriteLine($"[Item #{index}]: [{_item.Id}]: {_item.Name}\nPrice: ${_item.Price.ToString("######.00")}\nAmount in Inventory: {_item.Quantity}\nType of Product: {_item.TypeOfFood}\n");
+            if(index % 5 == 0)
+            {
+                VSIConfirm:
+                Console.WriteLine($"View next {menuSize} items? [Y/N]");
+                string? response = Console.ReadLine();
+                if(string.IsNullOrWhiteSpace(response))
+                {
+                    Console.WriteLine("Invalid!");
+                    goto VSIConfirm;
+                }
+                else
+                {
+                    response = response.ToUpper();
+                    char input = response[0];
+                    switch(input)
+                    {
+                        case 'Y': 
+                            index++; 
+                            continue;
+                        case 'N': 
+                            break;
+                        default:
+                            Console.WriteLine("Invalid response!");
+                            goto VSIConfirm;
+                    }
+                }
+            }
+            
+            index++;
+        }
+    }
+
+    private async Task GetStoreOrderHistoryAsync()
+    {
+            SOHValidation:
+        Console.WriteLine("How do you wish to view your order history?");
+        Console.WriteLine(
+            "1. View by date (oldest to newest)"
+            +"\n2. View by date(newest to oldest)"
+            +"\n3. View by price(lowest to highest)"
+            +"\n4. View by price(highest to lowest)");
+        string? uInput = Console.ReadLine();
+        if(string.IsNullOrWhiteSpace(uInput))
+        {
+            Console.WriteLine("Invalid Response!");
+            goto SOHValidation;
+        }
+        char input = uInput[0];
+        int select = input - '0';
+        
+        if(select >= 1 && select <= 4)
+        {
+            Dictionary<int, string> orderHistory = await httpService.CheckOrderHistoryAsyncAdmin(select, currentUser.StoreID);
+            string storeName = await httpService.GetStoreNameAsync(currentUser.UserID);
+            Console.WriteLine("Order history for: " + storeName);
+            foreach(KeyValuePair<int,string> _order in orderHistory)
+            {
+                Console.WriteLine(_order.Value);
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid Response!");
+            goto SOHValidation;
+        }
+
+    }
+
+
+
     private async Task CreateNewStoreAsync()
     {
         StoreName:
@@ -433,12 +522,18 @@ namespace JAConsole;
                 switch(input)
                 {
                     case 'Y': 
+
                         await httpService.CreateNewStoreAsync(newStore);
+
+                        Console.WriteLine("Store successfully added!");
                         
                         break;
                     case 'N':
                         Console.WriteLine("Returning to Admin Menu!");
                         return;
+                    default:
+                        Console.WriteLine("Invalid response!");
+                        goto CStore;
                 }
 
 
@@ -530,8 +625,26 @@ namespace JAConsole;
         {
             quantity = int.Parse(foodQuantity);
         }
+        if(_item.Price <= 0)
+        {
+            UIPrice:
+            Console.WriteLine("Enter the price");
+            string? foodPrice = Console.ReadLine();
+            if(string.IsNullOrWhiteSpace(foodPrice) || foodPrice == "0")
+            {
+                Console.WriteLine("Invalid price!");
+                goto UIPrice;
+            }
+            else
+            {
+                _item.Price = float.Parse(foodPrice);
+            }
+        }
+
+
+
         UIConfirm:
-        Console.WriteLine("Confirm you want to add " + quantity + " to " + _item.Name + ". [Y/N]");
+        Console.WriteLine("Confirm you want to add " + quantity + " to " + _item.Name + $", and change the price to ${_item.Price.ToString("######.00")}. [Y/N]");
         string? uInput = Console.ReadLine();
 
         if(string.IsNullOrWhiteSpace(uInput))
@@ -549,6 +662,7 @@ namespace JAConsole;
                 {
                     case 'Y': 
                         await httpService.UpdateItemQuantityAsync(_item, quantity);
+                        Console.WriteLine("Item added to inventory!");
                         //_bl.UpdateFoodItem(_item, quantity);
                         break;
                     case 'N':
@@ -617,6 +731,8 @@ namespace JAConsole;
                 {
                     case 'Y':
                         await httpService.CreateNewFoodItemAsync(_item, currentUser.StoreID);
+
+                        Console.WriteLine("Item added to inventory!");
                         break;
                     case 'N':
                         Console.WriteLine("Returning to Admin Menu!");
@@ -827,7 +943,7 @@ namespace JAConsole;
                 {
                     case 'Y': 
                         await httpService.RemoveItem(searchedItem, currentUser.StoreID);
-                        //_bl.RemoveItem(searchedItem, currentUser.StoreID);
+                        Console.WriteLine("Item removed from inventory!");
                         break;
                     case 'N': 
                         return;
@@ -903,8 +1019,8 @@ namespace JAConsole;
                 {
                     
                     float _newPrice = float.Parse(rInput);
-                    await httpService.ChangePriceAsync(searchedItem.Name, _newPrice, currentUser.StoreID);
-                    //_bl.ChangePrice(searchedItem, _newPrice, currentUser.StoreID);
+                    await httpService.ChangePriceAsync(searchedItem, _newPrice);
+
 
                 }
                 
@@ -1186,41 +1302,53 @@ private async Task ConfirmOrderAsync()
 {
     Dictionary<int, List<ShopItem>> _orderContents = await SearchForOrderAsync(currentUser.UserID);
     int key = await httpService.GetCartId(currentUser.UserID);
+
+    if(_orderContents.ContainsKey(0))
+    {
+        Console.WriteLine("Your cart is currently empty!");
+        return;
+    }
     List<ShopItem> _order = _orderContents[key];
     float totalPrice = 0;
     if(_order.Count > 0)
     {
 
-    Console.WriteLine("Your current order");
-    int index = 1;
-    foreach(ShopItem _item in _order)
-    {
-        Console.WriteLine($"Item #{index}: {_item.Quantity} {_item.Name}, $" + (_item.Price * _item.Quantity).ToString("###.00"));
-        index++;
-        totalPrice += (_item.Price * _item.Quantity);
-    }
 
-    Console.WriteLine( "Your total price is $" +totalPrice.ToString("######.00") );
-    COValidation:
-    Console.WriteLine("Do you wish to place this order? [Y/N]");
-    string? uInput = Console.ReadLine();
-                if(string.IsNullOrWhiteSpace(uInput))
-                {
-                    Console.WriteLine("Invalid Response!");
-                    goto COValidation;
-                }
-                uInput = uInput.ToUpper();
-                char input = uInput[0];
-                
-                switch(input)
-                {
-                    case 'Y':
-                    await httpService.ConfirmOrderAsync(_order, currentUser.UserID, key);
-                    //_bl.ConfirmOrder(_order, currentUser.StoreID, currentUser.UserID);
-                    break;
-                    case 'N':
-                        break;
-                }
+        Console.WriteLine("Your current order");
+        int index = 1;
+        foreach(ShopItem _item in _order)
+        {
+            Console.WriteLine($"Item #{index}: {_item.Quantity} {_item.Name}, $" + (_item.Price * _item.Quantity).ToString("###.00"));
+            index++;
+            totalPrice += (_item.Price * _item.Quantity);
+        }
+
+        Console.WriteLine( "Your total price is $" +totalPrice.ToString("######.00") );
+        COValidation:
+        Console.WriteLine("Do you wish to place this order? [Y/N]");
+        string? uInput = Console.ReadLine();
+        if(string.IsNullOrWhiteSpace(uInput))
+        {
+            Console.WriteLine("Invalid Response!");
+            goto COValidation;
+        }
+        uInput = uInput.ToUpper();
+        char input = uInput[0];
+        
+        switch(input)
+        {
+            case 'Y':
+            await httpService.ConfirmOrderAsync(_order, currentUser.UserID, key);
+            foreach(ShopItem _item in _order)
+            {
+                await httpService.RemoveOrderItemAsync(_item.Id, currentUser.UserID);
+            }
+            Console.WriteLine("Order successfully placed!");
+            break;
+            case 'N':
+                break;
+        }
+
     }
     else
     {
@@ -1248,8 +1376,7 @@ private async Task CheckOrderHistoryAsync()
     
     if(select >= 1 && select <= 4)
     {
-        Dictionary<int, string> orderHistory = new Dictionary<int, string>(); 
-        await httpService.CheckOrderHistoryAsync(select, currentUser.UserID);
+        Dictionary<int, string> orderHistory = await httpService.CheckOrderHistoryAsync(select, currentUser.UserID);
         //_bl.CheckOrderHistory(select, currentUser.UserID);
         foreach(KeyValuePair<int,string> _order in orderHistory)
         {
@@ -1293,7 +1420,17 @@ private async Task ChangeStore()
     }
 
 }
-
+    private void SuccessBeep()
+    {
+        Console.Beep(440, 170);
+        Console.Beep(523, 400);
+    }
+    
+    private void ErrorBeep()
+    {
+        Console.Beep(440, 170);
+        Console.Beep(246, 400);
+    }
 
 } //End of Line
 
@@ -1341,3 +1478,4 @@ do{
             }while(!isValid);
 
             */
+

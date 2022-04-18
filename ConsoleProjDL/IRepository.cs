@@ -20,6 +20,7 @@ public interface IRepo
     Task ChangeStoreAsync(int _newID, JAModel.UserPass _currentUser);
     Task<Dictionary<int, List<JAModel.ShopItem>>> SearchForOrderAsync(int userID);
     Task AddOrderItemAsync();
+    Task<Dictionary<int, string>> CheckOrderHistoryAsyncAdmin(int _select, int _storeID);
     Task RemoveOrderAsync();
     Task ConfirmOrderAsync(Dictionary<int, List<JAModel.ShopItem>> Order);
     /// <summary>
@@ -34,7 +35,7 @@ public interface IRepo
     Task CreateOrderAsync(int userID);
     Task<int> GetCartID(int userID);
     Task RemoveOrderItemAsync(int _itemID, int _userID);
-
+    Task<List<JAModel.ShopItem>> GetStoreInventoryAsync(int _storeID);
 }
 
     

@@ -124,9 +124,20 @@ public async Task<string> GetStoreNameAsync(int userID)
 {
     return await _repo.GetStoreNameAsync(userID);
 }
+
+public async   Task<List<JAModel.ShopItem>> GetStoreInventoryAsync(int _storeID)
+{
+    return await _repo.GetStoreInventoryAsync(_storeID);
+}
+
+
 public async Task< Dictionary<int, string>> CheckOrderHistoryAsync(int _select, int _userID)
 {
     return await _repo.CheckOrderHistoryAsync(_select, _userID);
+}
+public async Task<Dictionary<int, string>> CheckOrderHistoryAsyncAdmin(int _select, int _storeID)
+{
+    return await _repo.CheckOrderHistoryAsyncAdmin(_select, _storeID);
 }
 
 

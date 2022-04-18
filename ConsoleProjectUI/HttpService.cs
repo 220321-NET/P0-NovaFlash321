@@ -72,13 +72,12 @@ namespace ConsoleProjectUI
             return _users;
         }
 
-        public async Task ChangePriceAsync(string searchedItem, float newPrice, int storeID)
+        public async Task ChangePriceAsync(ShopItem searchedItem, float newPrice)
         {
-            ShopItem searchedShopItem = await SearchInventoryAsync(searchedItem, storeID);
-            searchedShopItem.Price = newPrice;
-            searchedShopItem.StoreID = storeID;
-            string url = _apiBaseURL + searchedItem  +"Price";
-            string serializedItem = JsonSerializer.Serialize(searchedShopItem);
+            searchedItem.Price = newPrice;
+
+            string url = _apiBaseURL + $"ChangeItemPrice/{searchedItem.Id}";
+            string serializedItem = JsonSerializer.Serialize(searchedItem);
             StringContent content = new StringContent(serializedItem, Encoding.UTF8, "application/json");
             HttpClient client = new HttpClient();
             try
@@ -122,7 +121,7 @@ namespace ConsoleProjectUI
             {
                 HttpResponseMessage response = await client.PostAsync(url, content);
                 response.EnsureSuccessStatusCode();
-                Console.WriteLine("Shop Successfully Created!");
+
             }
             catch(HttpRequestException e)
             {
@@ -172,17 +171,21 @@ namespace ConsoleProjectUI
 
         public async Task<string> GetStoreNameAsync(int userID)
         {   
-            //http get
-            Store _store = new Store();
-            return "";
-        //get store name
-        }
+            string url = _apiBaseURL + $"GetStoreName/{userID}";
+            HttpClient client = new HttpClient();
+            string storeName = "";
+            try
+            {
+                storeName = await client.GetStringAsync(url);
 
-        public async Task RemoveOrderCartAsync()
-        {
-        
-        //remove order cart
-        //http delete
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            
+            return storeName;
+        //get store name
         }
 
         public async Task RemoveOrderItemAsync(int _itemID, int _userID)
@@ -286,9 +289,41 @@ namespace ConsoleProjectUI
 
         public async Task<Dictionary<int,string>> CheckOrderHistoryAsync(int _select, int _userID)
         {
-            //http get
-        //check order history
-            return new Dictionary<int, string>();
+            string url = _apiBaseURL + $"GetUserHistory/{_select}/{_userID}";
+
+            Dictionary<int,string> _history = new Dictionary<int, string>();
+            HttpClient client = new HttpClient();
+            try
+            {
+                string responseString = await client.GetStringAsync(url);
+                _history = JsonSerializer.Deserialize<Dictionary<int, string>>(responseString) ?? new Dictionary<int, string>();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+
+            return _history;
+        }
+        public async Task<Dictionary<int,string>> CheckOrderHistoryAsyncAdmin(int _select, int _storeID)
+        {
+            string url = _apiBaseURL + $"GetStoreHistory/{_select}/{_storeID}";
+
+            Dictionary<int,string> _history = new Dictionary<int, string>();
+            HttpClient client = new HttpClient();
+            try
+            {
+                string responseString = await client.GetStringAsync(url);
+                _history = JsonSerializer.Deserialize<Dictionary<int, string>>(responseString) ?? new Dictionary<int, string>();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+
+            return _history;
         }
 
         public async Task ChangeStoreAsync(int _storeID, UserPass _currentUser)
@@ -366,8 +401,7 @@ namespace ConsoleProjectUI
             {
                 Console.WriteLine(e.Message);
             }
-            //http put
-        //update item quantity
+
         }
         #endregion
 
@@ -377,11 +411,12 @@ namespace ConsoleProjectUI
             _searchedItem.StoreID = _storeID;
             string serializedItem = JsonSerializer.Serialize(_searchedItem);
             StringContent content = new StringContent(serializedItem, Encoding.UTF8, "application/json");
+
             HttpClient client = new HttpClient();
-            //ERROR 405, Unsupported Media Type
+
             try
             {
-                HttpResponseMessage response = await client.DeleteAsync(url);
+                HttpResponseMessage response = await client.PutAsync(url, content);
                 response.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException e)
@@ -390,6 +425,24 @@ namespace ConsoleProjectUI
             }
 
         }
+
+        public async Task<List<ShopItem>> GetStoreInventoryAsync(int storeID)
+        {
+            string url = _apiBaseURL + $"GetStoreInventory/{storeID}";
+            List<ShopItem> _inventory = new List<ShopItem>();
+            HttpClient client = new HttpClient();
+
+            try
+            {
+                string responseString = await client.GetStringAsync(url);
+                _inventory = JsonSerializer.Deserialize<List<ShopItem>>(responseString) ?? new List<ShopItem>();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return _inventory;
+        }
+
     }
 }
-
