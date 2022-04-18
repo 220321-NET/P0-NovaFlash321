@@ -2390,11 +2390,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "g:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj",
+      "projectUniqueName": "G:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj",
       "projectName": "ConsoleProjectUI",
-      "projectPath": "g:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj",
+      "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj",
       "packagesPath": "C:\\Users\\Nova\\.nuget\\packages\\",
-      "outputPath": "g:\\Training\\Week1\\P1\\ConsoleProjectUI\\obj\\",
+      "outputPath": "G:\\Training\\Week1\\P1\\ConsoleProjectUI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -2415,11 +2415,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "g:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj": {
-              "projectPath": "g:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj"
+            "G:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj": {
+              "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj"
             },
-            "g:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj": {
-              "projectPath": "g:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj"
+            "G:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj": {
+              "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj"
             }
           }
         }

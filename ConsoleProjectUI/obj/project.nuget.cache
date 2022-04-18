@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "emhHX96BiMrbg41EegEHGzXvb0JA19uHKbZOSZxM6QCRqHnU1EC+UXipUxq1ohAGARnAsg2EStVwypcj/OExGg==",
+  "dgSpecHash": "tRuwo9EezgmnWPLbOQ1H7i99+C2hdrCj0rtnDORzrX/kIZkdp9y/O6De1jZ/MP6J6u28n85v1CRQgDwXWZIejA==",
   "success": true,
-  "projectFilePath": "g:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj",
+  "projectFilePath": "G:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Nova\\.nuget\\packages\\azure.core\\1.6.0\\azure.core.1.6.0.nupkg.sha512",
     "C:\\Users\\Nova\\.nuget\\packages\\azure.identity\\1.3.0\\azure.identity.1.3.0.nupkg.sha512",
