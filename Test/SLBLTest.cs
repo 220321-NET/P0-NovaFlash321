@@ -4,6 +4,7 @@ using Moq;
 using JAConsoleBL;
 using JAConsoleDL;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 namespace Test;
 
 public class SLBLTests
@@ -85,6 +86,7 @@ public class CustomerTests
         UserPass testUser = new UserPass();
         testUser.FirstName = "Test Name";
         Assert.Equal("Test Name", testUser.FirstName);
+        Assert.Throws<ValidationException>(() => testUser.FirstName = "");
     }
     [Fact]
     public void ValidCustomerLastName()
@@ -92,6 +94,7 @@ public class CustomerTests
         UserPass testUser = new UserPass();
         testUser.LastName = "Test Name";
         Assert.Equal("Test Name", testUser.LastName);
+        Assert.Throws<ValidationException>(() => testUser.LastName = "");
     }
     [Fact]
     public void ValidCustomerUserName()
@@ -99,6 +102,8 @@ public class CustomerTests
         UserPass testUser = new UserPass();
         testUser.UserName = "TestName";
         Assert.Equal("TestName", testUser.UserName);
+        Assert.Throws<ValidationException>(() => testUser.UserName = "");
+        
     }
     [Fact]
     public void ValidCustomerPassword()
@@ -106,6 +111,8 @@ public class CustomerTests
         UserPass testUser = new UserPass();
         testUser.PassWord = "TestName";
         Assert.Equal("TestName", testUser.PassWord);
+        
+        Assert.Throws<ValidationException>(() => testUser.PassWord = "");
     }
 
 }
