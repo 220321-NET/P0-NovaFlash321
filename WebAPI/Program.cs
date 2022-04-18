@@ -1,10 +1,14 @@
 using JAModel;
-
+using Serilog;
 using JAConsoleDL;
 using JAConsoleBL;
 
-
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, config) =>
+{
+    config.WriteTo.Console().WriteTo.File("../Logs/log.txt", rollingInterval: RollingInterval.Day);
+});
 
 //dotnet run --configuration Debug
 // Add services to the container.

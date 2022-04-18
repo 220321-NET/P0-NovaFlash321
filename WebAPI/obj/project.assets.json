@@ -959,7 +959,8 @@
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
           "ConsoleProjDL": "1.0.0",
-          "ConsoleProjModel": "1.0.0"
+          "ConsoleProjModel": "1.0.0",
+          "Serilog.AspNetCore": "5.0.0"
         },
         "compile": {
           "bin/placeholder/ConsoleProjBL.dll": {}
@@ -971,6 +972,9 @@
       "ConsoleProjDB/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "Serilog.AspNetCore": "5.0.0"
+        },
         "compile": {
           "bin/placeholder/ConsoleProjDB.dll": {}
         },
@@ -984,7 +988,8 @@
         "dependencies": {
           "ConsoleProjDB": "1.0.0",
           "ConsoleProjModel": "1.0.0",
-          "Microsoft.Data.SqlClient": "4.1.0"
+          "Microsoft.Data.SqlClient": "4.1.0",
+          "Serilog.AspNetCore": "5.0.0"
         },
         "compile": {
           "bin/placeholder/ConsoleProjDL.dll": {}
@@ -998,7 +1003,9 @@
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
           "ConsoleProjBL": "1.0.0",
-          "ConsoleProjModel": "1.0.0"
+          "ConsoleProjModel": "1.0.0",
+          "Microsoft.Data.SqlClient": "4.1.0",
+          "Serilog.AspNetCore": "5.0.0"
         },
         "compile": {
           "bin/placeholder/ConsoleProjectUI.dll": {}
@@ -3295,6 +3302,7 @@
       "ConsoleProjModel >= 1.0.0",
       "ConsoleProjectUI >= 1.0.0",
       "Serilog.AspNetCore >= 5.0.0",
+      "Serilog.Sinks.Console >= 4.0.1",
       "Swashbuckle.AspNetCore >= 6.2.3"
     ]
   },
@@ -3333,14 +3341,14 @@
             "G:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj": {
               "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjBL\\ConsoleProjBL.csproj"
             },
-            "G:\\Training\\Week1\\P1\\ConsoleProjDL\\ConsoleProjDL.csproj": {
-              "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjDL\\ConsoleProjDL.csproj"
+            "g:\\Training\\Week1\\P1\\ConsoleProjDL\\ConsoleProjDL.csproj": {
+              "projectPath": "g:\\Training\\Week1\\P1\\ConsoleProjDL\\ConsoleProjDL.csproj"
             },
             "G:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj": {
               "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjectUI\\ConsoleProjectUI.csproj"
             },
-            "G:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj": {
-              "projectPath": "G:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj"
+            "g:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj": {
+              "projectPath": "g:\\Training\\Week1\\P1\\ConsoleProjModel\\ConsoleProjModel.csproj"
             }
           }
         }
@@ -3358,6 +3366,10 @@
           "Serilog.AspNetCore": {
             "target": "Package",
             "version": "[5.0.0, )"
+          },
+          "Serilog.Sinks.Console": {
+            "target": "Package",
+            "version": "[4.0.1, )"
           },
           "Swashbuckle.AspNetCore": {
             "target": "Package",
