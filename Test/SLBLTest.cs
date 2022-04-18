@@ -74,3 +74,38 @@ public class SLBLTests
         mockDL.Verify(dl => dl.GetStoresAsync(), Times.Exactly(1));
     }
 }
+
+
+
+public class CustomerTests
+{
+    [Fact]
+    public void ValidCustomerFirstName()
+    {
+        UserPass testUser = new UserPass();
+        testUser.FirstName = "Test Name";
+        Assert.Equal("Test Name", testUser.FirstName);
+    }
+    [Fact]
+    public void ValidCustomerLastName()
+    {
+        UserPass testUser = new UserPass();
+        testUser.LastName = "Test Name";
+        Assert.Equal("Test Name", testUser.LastName);
+    }
+    [Fact]
+    public void ValidCustomerUserName()
+    {
+        UserPass testUser = new UserPass();
+        testUser.UserName = "TestName";
+        Assert.Equal("TestName", testUser.UserName);
+    }
+    [Fact]
+    public void ValidCustomerPassword()
+    {
+        UserPass testUser = new UserPass();
+        testUser.PassWord = "TestName";
+        Assert.Equal("TestName", testUser.PassWord);
+    }
+
+}
