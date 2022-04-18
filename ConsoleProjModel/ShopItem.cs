@@ -19,6 +19,7 @@ namespace JAModel;
         get => storeID;
         set
         {
+            
             storeID = value;
         }
     }
@@ -32,7 +33,7 @@ namespace JAModel;
             {
                 if(String.IsNullOrWhiteSpace(value))
                 {
-                    typeOfFood = "null";
+                    throw new Exception("Type cannot be empty");
                 }
                 typeOfFood = value;
             }
@@ -48,8 +49,9 @@ namespace JAModel;
             {
                 if(String.IsNullOrWhiteSpace(value))
                 {
-                    name = "null";
+                    throw new Exception("Name cannot be empty");
                 }
+                
                 name = value;
             }    
         }
@@ -60,7 +62,7 @@ namespace JAModel;
             set
             {
                 if(value <= 0){
-                    price = 0;
+                    throw new Exception("Price cannot be empty");
                 }
 
                 price = value;
@@ -70,7 +72,7 @@ namespace JAModel;
             get => quantity;
             set{
                 if(value <= 0){
-                    quantity = 0;
+                    throw new Exception("Quantity cannot be empty");
 
                 }
                 quantity = value;

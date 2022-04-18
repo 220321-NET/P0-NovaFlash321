@@ -22,9 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-  <ProjectReference Include ="..\ConsoleProjModel\ConsoleProjModel.csproj" />
-  <ProjectReference Include ="..\ConsoleProjDL\ConsoleProjDL.csproj" />
-  <ProjectReference Include ="..\ConsoleProjBL\ConsoleProjBL.csproj" />
+    <ProjectReference Include ="..\ConsoleProjModel\ConsoleProjModel.csproj" />
+    <ProjectReference Include ="..\ConsoleProjDL\ConsoleProjDL.csproj" />
+    <ProjectReference Include ="..\ConsoleProjBL\ConsoleProjBL.csproj" />
   </ItemGroup>
 
 </Project>
