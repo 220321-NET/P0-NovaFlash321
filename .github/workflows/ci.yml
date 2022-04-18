@@ -3,9 +3,9 @@ name: CI
 
 on:
   push:
-    branches: [ DevOps ]
+    branches: [ DevOps, master ]
   pull_request:
-    branches: [ DevOps ]
+    branches: [ DevOps, master ]
   workflow_dispatch:
 
 permissions:
